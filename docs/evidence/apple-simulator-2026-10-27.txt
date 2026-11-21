@@ -1,0 +1,16 @@
+Test Case '-[ContextFriendProTests.CoreTests testApprovalInvalidationAndSources]' started.
+Test Case '-[ContextFriendProTests.CoreTests testApprovalInvalidationAndSources]' passed (0.002 seconds).
+Test Case '-[ContextFriendProTests.CoreTests testIndependentPythonWireVector]' started.
+Test Case '-[ContextFriendProTests.CoreTests testIndependentPythonWireVector]' passed (0.028 seconds).
+Test Case '-[ContextFriendProTests.CoreTests testQRReassemblyAndExpiry]' started.
+Test Case '-[ContextFriendProTests.CoreTests testQRReassemblyAndExpiry]' passed (0.001 seconds).
+Test Case '-[ContextFriendProTests.CoreTests testRealSpeakerModels]' started.
+Test Case '-[ContextFriendProTests.CoreTests testRealSpeakerModels]' passed (0.530 seconds).
+Test Case '-[ContextFriendProTests.CoreTests testRealWhisperAndSilence]' started.
+Test Case '-[ContextFriendProTests.CoreTests testRealWhisperAndSilence]' passed (0.262 seconds).
+Test Case '-[ContextFriendProTests.CoreTests testVaultAndRecovery]' started.
+Test Case '-[ContextFriendProTests.CoreTests testVaultAndRecovery]' passed (0.014 seconds).
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.838 (0.840) seconds
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.838 (0.840) seconds
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.838 (0.840) seconds
+** TEST SUCCEEDED **

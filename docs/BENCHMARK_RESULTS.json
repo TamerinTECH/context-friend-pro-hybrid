@@ -1,0 +1,261 @@
+{
+  "date": "2026-10-27",
+  "status": "PROTOTYPE_NOT_DEVICE_QUALIFIED",
+  "android_emulator": {
+    "status": "PASS",
+    "os": "Android 15 API 35",
+    "abi": "x86_64",
+    "ram_mib": 4096,
+    "cores": 4,
+    "network": "Wi-Fi and cellular disabled via adb svc",
+    "tests": 8,
+    "failures": 0,
+    "test_seconds": 86.482,
+    "cases": [
+      {
+        "name": "qrAndBleReassemblyRejectHostileFrames",
+        "seconds": 0.112
+      },
+      {
+        "name": "realSpeakerModelsReturnTurnsAndEmbedding",
+        "seconds": 1.154
+      },
+      {
+        "name": "encryptedRecoveryAndApproval",
+        "seconds": 0.287
+      },
+      {
+        "name": "independentPythonWireVector",
+        "seconds": 0.201
+      },
+      {
+        "name": "recipientBoundPurposeLimitedTransferAndReceipt",
+        "seconds": 0.253
+      },
+      {
+        "name": "profileConsentAndModelCompatibility",
+        "seconds": 0.18
+      },
+      {
+        "name": "actualWhisperRecognizesNaturalSpeechFixture",
+        "seconds": 69.192
+      },
+      {
+        "name": "readerNavigationAndNativeRecording",
+        "seconds": 13.334
+      }
+    ],
+    "limits": "No physical radio, room microphone, hardware key, battery or thermal qualification"
+  },
+  "windows_summary_probe": {
+    "status": "PASS_SCHEMA_AND_SOURCE_IDS",
+    "backend": "CPU; same native/engine.cpp bridge",
+    "model": "gemma4-e2b",
+    "context_tokens": 4096,
+    "elapsed_seconds": 58.329294,
+    "includes_model_load": true,
+    "conditions": "One synthetic 2-segment source; concurrent development builds; not a mobile benchmark",
+    "quality": "Manual smoke inspection only; empty decisions category despite an agreement in paragraphs; not held-out qualification"
+  },
+  "apple_simulator": {
+    "status": "PASS_SMOKE_ONLY",
+    "device": "iPhone 17 Pro",
+    "os": "iOS 26.1",
+    "host": "AWS M2 Large, macOS 15.7.1, Xcode 26.1.1",
+    "tests": 6,
+    "failures": 0,
+    "test_seconds": 0.84,
+    "limits": "Simulator timing is not a mobile performance benchmark; no Gemma, accuracy or long-recording qualification"
+  },
+  "physical_devices": [
+    {
+      "requested_device": "Pixel 11 Pro",
+      "status": "NOT_RUN"
+    },
+    {
+      "requested_device": "iPhone X",
+      "status": "PASS_SMOKE_ONLY",
+      "provider": "AWS Device Farm",
+      "os": "iOS 16.7.11",
+      "tests": 6,
+      "failures": 0,
+      "run_id": "41a8211b-074c-4b8d-ac46-757ac23240c3",
+      "limits": "Fixture inference and core logic only; no live microphone, Gemma, transfers, accuracy or long-recording qualification; not Ron's own handset",
+      "cases": [
+        {
+          "name": "testRealSpeakerModels",
+          "seconds": 0.988
+        },
+        {
+          "name": "testQRReassemblyAndExpiry",
+          "seconds": 0.005
+        },
+        {
+          "name": "testRealWhisperAndSilence",
+          "seconds": 1.235
+        },
+        {
+          "name": "testVaultAndRecovery",
+          "seconds": 0.029
+        },
+        {
+          "name": "testApprovalInvalidationAndSources",
+          "seconds": 0.002
+        },
+        {
+          "name": "testIndependentPythonWireVector",
+          "seconds": 0.036
+        }
+      ],
+      "timing_note": "XCTest wall times for one short fixture, including model load; not accuracy or sustained RTF qualification"
+    },
+    {
+      "requested_device": "iPad Air 2026",
+      "status": "NOT_RUN"
+    }
+  ],
+  "cross_platform_transports": {
+    "BLE": "NOT_RUN_PHYSICAL_DEVICES_REQUIRED",
+    "QR": "NOT_RUN_PHYSICAL_DEVICES_REQUIRED",
+    "LAN": "NOT_RUN_PHYSICAL_DEVICES_REQUIRED"
+  },
+  "natural_language_quality": {
+    "en": {
+      "WER": null,
+      "CER": null,
+      "DER": null,
+      "status": "NOT_RUN"
+    },
+    "de": {
+      "WER": null,
+      "CER": null,
+      "DER": null,
+      "status": "NOT_RUN"
+    },
+    "he": {
+      "WER": null,
+      "CER": null,
+      "DER": null,
+      "status": "NOT_RUN"
+    }
+  },
+  "long_recordings": {
+    "30_minutes_locked": "NOT_RUN",
+    "60_minutes_recovery": "NOT_RUN"
+  },
+  "models": [
+    {
+      "id": "whisper-tiny",
+      "task": "asr",
+      "file": "ggml-tiny.bin",
+      "revision": "5359861c739e955e79d9a303bcbc70fb988958b1",
+      "repo": "ggerganov/whisper.cpp",
+      "license": "MIT",
+      "runtime": "whisper.cpp 1.9.5",
+      "quantization": "f16",
+      "languages": [
+        "en",
+        "de",
+        "he"
+      ],
+      "url": "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-tiny.bin",
+      "bytes": 77691713,
+      "sha256": "be07e048e1e599ad46341c8d2a135645097a538221678b7acdd1b1919c6e1b21",
+      "qualification": "Physical Pixel 8 Pro and iPhone X fixture smoke passed; accuracy and listed-language qualification NOT RUN"
+    },
+    {
+      "id": "whisper-small",
+      "task": "asr",
+      "file": "ggml-small-q5_1.bin",
+      "revision": "5359861c739e955e79d9a303bcbc70fb988958b1",
+      "repo": "ggerganov/whisper.cpp",
+      "license": "MIT",
+      "runtime": "whisper.cpp 1.9.5",
+      "quantization": "q5_1",
+      "languages": [
+        "en",
+        "de",
+        "he"
+      ],
+      "url": "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-small-q5_1.bin",
+      "bytes": 190085487,
+      "sha256": "ae85e4a935d7a567bd102fe55afc16bb595bdb618e11b2fc7591bc08120411bb",
+      "qualification": "NOT RUN on physical devices; listed languages are evaluation targets"
+    },
+    {
+      "id": "gemma4-e2b",
+      "task": "summary",
+      "file": "gemma-4-E2B_q4_0-it.gguf",
+      "revision": "675cff42a74c774d6cb76f76d8eacb49b48c9b93",
+      "repo": "google/gemma-4-E2B-it-qat-q4_0-gguf",
+      "license": "Apache-2.0",
+      "runtime": "llama.cpp 0.7.0",
+      "quantization": "qat-q4_0",
+      "languages": [
+        "en",
+        "de",
+        "he"
+      ],
+      "url": "https://huggingface.co/google/gemma-4-E2B-it-qat-q4_0-gguf/resolve/675cff42a74c774d6cb76f76d8eacb49b48c9b93/gemma-4-E2B_q4_0-it.gguf",
+      "bytes": 3349516256,
+      "sha256": "fa401b55b07ee70a54c6dae3903c783a6e65064312529ea57175cb5f8dec6634",
+      "qualification": "NOT RUN on physical devices; listed languages are evaluation targets"
+    },
+    {
+      "id": "titanet-small",
+      "task": "embedding",
+      "file": "nemo_en_titanet_small.onnx",
+      "revision": "speaker-recongition-models",
+      "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-recongition-models/nemo_en_titanet_small.onnx",
+      "license": "Apache-2.0 (TitaNet-S NGC model card links NeMo license)",
+      "runtime": "sherpa-onnx 2.0.1",
+      "quantization": "fp32",
+      "languages": [],
+      "bytes": 40257283,
+      "sha256": "ad4a1802485d8b34c722d2a9d04249662f2ece5d28a7a039063ca22f515a789e",
+      "qualification": "Physical Pixel 8 Pro and iPhone X fixture smoke passed; accuracy and listed-language qualification NOT RUN"
+    },
+    {
+      "id": "pyannote-segmentation3",
+      "task": "segmentation",
+      "file": "segmentation.int8.onnx",
+      "revision": "24615ee884c897d9d2ba09bb4d30da6bb1b15e685065962db5b02e76e4996488",
+      "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-segmentation-models/sherpa-onnx-pyannote-segmentation-3-0.tar.bz2",
+      "archive": true,
+      "license": "MIT; user confirmed upstream access terms 2026-10-27",
+      "runtime": "sherpa-onnx 2.0.1",
+      "quantization": "int8",
+      "languages": [],
+      "qualification": "Physical Pixel 8 Pro and iPhone X fixture smoke passed; accuracy and listed-language qualification NOT RUN",
+      "bytes": 1540506,
+      "sha256": "d582f4b4c6b48205de7e0643c57df0df5615a3c176189be3fc461e9d18827b5d"
+    }
+  ],
+  "recording_regression": {
+    "status": "PASS",
+    "repetitions": 3,
+    "seconds": [
+      13.106,
+      12.715,
+      12.659
+    ]
+  },
+  "android_physical_smoke": {
+    "status": "PASS_SMOKE_ONLY",
+    "provider": "AWS Device Farm",
+    "device": "Google Pixel 8 Pro",
+    "os": "Android 15",
+    "run_id": "33fafbeb-d730-4ad8-a0e0-4fca4b0da0f9",
+    "tests": 8,
+    "failures": 0,
+    "app_sha256": "2f02d9fc55699dd1453ea7137bd5b71960d53de34072ce29e1366ac7f0b6c2cd",
+    "test_sha256": "63a34ed7d52ab324babf9a454c048313101e006ac5ba9a71ad099cd7de39dbe8",
+    "radios_requested_off": [
+      "wifi",
+      "bluetooth",
+      "nfc",
+      "gps"
+    ],
+    "limits": "Public speech fixture and short native recording only; no Gemma, accuracy, long recording, thermal, battery or two-phone transfer qualification"
+  }
+}

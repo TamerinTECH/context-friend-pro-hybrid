@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The ContextFriend mark (context-friend apps/web BrandMark.tsx), inside the adaptive icon's safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+    <group android:translateX="24" android:translateY="24" android:scaleX="1.25" android:scaleY="1.25">
+        <path android:fillColor="#F7C948" android:pathData="M17.5,19.8a4.2,4.2 0 1,0 0,8.4a4.2,4.2 0 1,0 0,-8.4z" />
+        <path android:strokeColor="#FFFFFF" android:strokeWidth="3.4" android:strokeLineCap="round" android:pathData="M25.5,16a11.5,11.5 0 0,1 0,16" />
+        <path android:strokeColor="#FFFFFF" android:strokeAlpha="0.6" android:strokeWidth="3.4" android:strokeLineCap="round" android:pathData="M31.5,11.5a17.5,17.5 0 0,1 0,25" />
+    </group>
+</vector>

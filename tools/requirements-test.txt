@@ -1,0 +1,4 @@
+PyNaCl==1.6.2
+tree-sitter==0.26.0
+tree-sitter-swift==0.7.4
+jsonschema==4.26.0

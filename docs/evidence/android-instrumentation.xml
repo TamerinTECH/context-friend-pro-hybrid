@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="tech.tamerin.contextfriendpro.CoreInstrumentationTest" tests="8" failures="0" errors="0" skipped="0" time="86.482" timestamp="2026-10-27T18:18:33" hostname="localhost">
+  <properties>
+    <property name="device" value="ContextFriendPro(AVD) - 15" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="qrAndBleReassemblyRejectHostileFrames" classname="tech.tamerin.contextfriendpro.CoreInstrumentationTest" time="0.112" />
+  <testcase name="realSpeakerModelsReturnTurnsAndEmbedding" classname="tech.tamerin.contextfriendpro.CoreInstrumentationTest" time="1.154" />
+  <testcase name="encryptedRecoveryAndApproval" classname="tech.tamerin.contextfriendpro.CoreInstrumentationTest" time="0.287" />
+  <testcase name="independentPythonWireVector" classname="tech.tamerin.contextfriendpro.CoreInstrumentationTest" time="0.201" />
+  <testcase name="recipientBoundPurposeLimitedTransferAndReceipt" classname="tech.tamerin.contextfriendpro.CoreInstrumentationTest" time="0.253" />
+  <testcase name="profileConsentAndModelCompatibility" classname="tech.tamerin.contextfriendpro.CoreInstrumentationTest" time="0.18" />
+  <testcase name="actualWhisperRecognizesNaturalSpeechFixture" classname="tech.tamerin.contextfriendpro.CoreInstrumentationTest" time="69.192" />
+  <testcase name="readerNavigationAndNativeRecording" classname="tech.tamerin.contextfriendpro.FlowTest" time="13.334" />
+</testsuite>

@@ -1,0 +1,11 @@
+2026-10-27, Android 15 API 35 x86_64 ContextFriendPro emulator, 4096 MiB RAM.
+Final packaged debug APK installed with adb; Wi-Fi and mobile data disabled.
+Command per run:
+adb -s emulator-5580 shell am instrument -w -e class tech.tamerin.contextfriendpro.FlowTest tech.tamerin.contextfriendpro.test/androidx.test.runner.AndroidJUnitRunner
+
+Run 1: Time 13.106, OK (1 test)
+Run 2: Time 12.715, OK (1 test)
+Run 3: Time 12.659, OK (1 test)
+
+Capture tests on the emulator do not establish physical microphone quality,
+locked-screen recording, battery/thermal behavior or phone OS lifecycle reliability.

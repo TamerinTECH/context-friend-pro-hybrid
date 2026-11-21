@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.bat text eol=crlf
+*.png -text
+*.pcm -text
+*.jar -text
+docs/ORIGINAL_BRIEF.md -whitespace
+shared/licenses/* -whitespace

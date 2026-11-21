@@ -1,0 +1,40 @@
+{
+  "notice": "PUBLIC TEST KEYS ONLY - DO NOT USE FOR REAL DATA",
+  "recipient": {
+    "boxPublic": "j0DFrbaPJWJK5bIU6nZ6bslNgp09e14a0bpvPiE4KF8",
+    "boxSecret": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8",
+    "signPublic": "JUO5L_EJVRFHatyDadtt3JM2ZaEZeN2hQE7hBmypVZ0",
+    "signSecret": "QEFCQ0RFRkdISUpLTE1OT1BRUlNUVVZXWFlaW1xdXl8lQ7kv8QlVEUdq3INp223ckzZloRl43aFATuEGbKlVnQ"
+  },
+  "invitation": {
+    "version": 1,
+    "id": "00000000-0000-4000-8000-000000000001",
+    "boxKey": "j0DFrbaPJWJK5bIU6nZ6bslNgp09e14a0bpvPiE4KF8",
+    "signKey": "JUO5L_EJVRFHatyDadtt3JM2ZaEZeN2hQE7hBmypVZ0",
+    "ttl": 600,
+    "host": null,
+    "port": null
+  },
+  "payload": {
+    "version": 1,
+    "bundleId": "00000000-0000-4000-8000-000000000002",
+    "purpose": "meeting",
+    "meeting": {
+      "sessionId": "00000000-0000-4000-8000-000000000003",
+      "revision": "00000000-0000-4000-8000-000000000004",
+      "createdAt": 0,
+      "language": "he",
+      "title": "Public protocol fixture",
+      "approved": true,
+      "summary": "שלום · Prüfung · offline",
+      "transcript": null,
+      "speakers": null,
+      "audio": null,
+      "stages": {}
+    },
+    "profiles": null
+  },
+  "envelope": "Q0ZCMQEAAAAAAABAAIAAAAAAAAABAAAAAAAAQACAAAAAAAAAAo9Axa22jyViSuWyFOp2em7JTYKdPXteGtG6bz4hOChfJUO5L_EJVRFHatyDadtt3JM2ZaEZeN2hQE7hBmypVZ0prLrhQbzK8LIuGpTTTQvHNh5SbQv-EsiXlLyTIpZt1wABAgMEBQYHCAkKCwwNDg8QERITFBUWFxFvAo5E1RyJxPxBIyIOnR_qmlCkQJX53HgkVBpR4uRt-EWhTXBlImuDTxwZKblf1ZZNB4MWKzpmn-D0caU9-RFZWMjAQ93j0o_OX0XZqGSiAAABm2Fymbf-CL80z80EUpq3Qisl9_vOChvmYLfGBsbn2txy8MlqCpU3UIifsI-B2965tmW9Px5JaHrjbEi1o37vxVWT2ilxS2409IO8miJH8wz1VaNtNYsGOiJTHqU8vg9MsVBuNSdCLO1rsUR5EXcZ_nlvhsfp0Wh-ZMA40z3SNcjUa8gGRqUJaOXhrD_1sSzdmD3-3j0y0p6H1NB6tLbwZMmqYQk2K60g0PJmHO7Llbs5V1YEQz6TZZ1kIVt8hF6gUvobREtuRIeDFOxSRHFztqQL887cTGB5QGj4N7gNiU7QY6kf_sPxynsPXhCupjdwzjbM5BCBvMPQ2DbkgkaC2nQ6AJbsW13KT8bxYXb4SBcIaYsfJw1ecsa6AoWxMFkzIjjdJYc6vx2rFxw10rmfmlwp9sXXQDhAbFW6VIvyIXARqpmhzrtR9alnhdFsobfeVsWkl6OmgD-eS_ztrygheMj-wONk_Wks2ZePibuTWPNrfST-CgCroAzmu3oDP2fP3NpqLyH6ycB7l3g-bHOdG2oxANDMX8afX1YsXeGrMh2uzBIptFMCX7ssJXPGhNSG2vw60PE5BQtVvSDuWx7cLzGfI3Pw7TFj-5NW6CxhCmUqQN96Z3ayL2jZ4gM",
+  "sha256": "e0acee0e0780b8c30d8f973db09d59edaa5a1f892fec7d542a9ebdc9b39cb53b",
+  "receipt": "CFR1:00000000-0000-4000-8000-000000000001:00000000-0000-4000-8000-000000000002:e0acee0e0780b8c30d8f973db09d59edaa5a1f892fec7d542a9ebdc9b39cb53b:imported:FaFlZAuqD3MY6U2p5_1kaVZ9FLoXAO25t9qPin_a-P4uDoHgv5dRO8cWvaH7ogFeXubwXxI1whtYA7AmPxkgBA"
+}
