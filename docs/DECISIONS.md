@@ -60,3 +60,27 @@ unverified unless separately pinned. Approval is revision-specific.
 Upstream references are recorded in THIRD_PARTY_NOTICES.md. No inference performance,
 speaker matching threshold, language quality, radio interoperability or hardware
 key-security claim is qualified by source code alone.
+
+## #BuildHybridAI amendment (Ron, 21–22 November 2026)
+
+This repository is the public hackathon edition, entered by TamerinTECH GmbH with Ron as
+Representative. It supersedes the "no remote inference" boundary above in one way only:
+cloud processing is now possible, but always opt-in, per request, after local redaction.
+
+- **Lead audience:** schools (parent–teacher conferences, support-plan and counselling
+  meetings). Medical and legal meetings are additional templates, not the headline.
+- **Platform:** Android first, reference device Pixel 11 Pro (Gemini Nano 4 via the AICore
+  Developer Preview). iOS only if time remains.
+- **Generative AI goes through Firebase AI Logic.** Meeting notes use Gemini Nano with
+  `ONLY_ON_DEVICE`. The prototype's Gemma 4 engine stays as the local engine for languages
+  Nano is not validated for (on-device validation covers English and Korean only) and for
+  phones without Nano. Transcription and speaker separation stay on our own engines,
+  because Gemini Nano on Android accepts no audio.
+- **Cloud:** Gemini through Firebase AI Logic on the Vertex AI (Agent Platform) backend in
+  an EU region, Blaze plan with a budget alert. The free Gemini Developer API tier is not
+  allowed for apps offered to EEA users (Gemini API Additional Terms, effective 23 Mar 2026).
+- **Firebase services:** App Check (debug provider in debug builds, Play Integrity for
+  release), anonymous Authentication, Remote Config for routing policy and model names,
+  Firestore only for end-to-end-encrypted shares (the server stores ciphertext).
+- **Repository:** new public repo with the prototype imported as one disclosed commit
+  (docs/PRE_EXISTING.md); the private prototype repository stays untouched.

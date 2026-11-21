@@ -52,10 +52,10 @@ class ScreenshotTourTest {
             paragraphs=listOf(Statement("The team reviewed the spring release. The mobile app is on track; sharing needs one more week of testing.",listOf(ids[1])),
                 Statement("The release date stays. The second export format is cut to protect the date.",listOf(ids[2]))),
             decisions=listOf(Statement("Keep the release date and drop the second export format.",listOf(ids[2]))),
-            actions=listOf(ActionItem("Write the release notes","Maria","Thursday",listOf(ids[3])),ActionItem("Ask the school about the pilot start","Daniel","Monday",listOf(ids[5]))),
+            actions=listOf(ActionItem("Write the release notes","Jonas Testmann","Thursday",listOf(ids[3])),ActionItem("Ask the school about the pilot start","Mila Sonnenberg","Monday",listOf(ids[5]))),
             uncertainties=listOf(Statement("Unclear whether the school pilot starts in March or April.",listOf(ids[4]))))
         return Session(title="Spring release planning",state="needs_review",language="en",durationMs=3_120_000,transcript=t,summary=summary,
-            speakers=mapOf("S1" to "Ron","S2" to "Daniel","S3" to "Maria"),speakerVectors=mapOf("S1" to List(192){0.1f},"S2" to List(192){0.2f},"S3" to List(192){0.3f}),
+            speakers=mapOf("S1" to "Alex Sample","S2" to "Mila Sonnenberg","S3" to "Jonas Testmann"),speakerVectors=mapOf("S1" to List(192){0.1f},"S2" to List(192){0.2f},"S3" to List(192){0.3f}),
             stages=mapOf("asr" to Stage("done"),"speakers" to Stage("done"),"summary" to Stage("done")))
     }
 
@@ -68,7 +68,7 @@ class ScreenshotTourTest {
                 transcript=listOf(seg(11,0,"S1","Thanks for joining.")),summary=Summary("Customer call",listOf(Statement("Short intro call.",listOf("00000000-0000-4000-8000-000000000011")))));app.vault.create(b).fill(0);created+=b.id
             val c=Session(title="Team sync (processing failed)",state="failed",durationMs=900_000);app.vault.create(c).fill(0);created+=c.id
             val d=Session(title="Board prep",state="recorded",durationMs=2_400_000);app.vault.create(d).fill(0);created+=d.id
-            app.vault.putProfiles(listOf(VoiceProfile(name="Ron",embedding=List(192){0.1f},modelHash="a".repeat(64)),VoiceProfile(name="Daniel",embedding=List(192){0.2f},modelHash="a".repeat(64))))
+            app.vault.putProfiles(listOf(VoiceProfile(name="Alex Sample",embedding=List(192){0.1f},modelHash="a".repeat(64)),VoiceProfile(name="Mila Sonnenberg",embedding=List(192){0.2f},modelHash="a".repeat(64))))
             app.changed();Thread.sleep(800);ui.waitForIdle()
             step("list") {shot("start-previous-meetings")}
 

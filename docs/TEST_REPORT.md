@@ -1,5 +1,9 @@
 # Prototype test report — 27 October 2026
 
+> Sections dated 27 Oct – 6 Nov 2026 are the record of the pre-existing prototype
+> (docs/PRE_EXISTING.md). The AWS runbook and raw AWS evidence they link to were not
+> imported into this public repository.
+
 **Android builds and eight tests passed on an emulator and a physical Pixel 8 Pro.
 Apple simulator/device builds and six tests on both a simulator and physical iPhone X also passed.
 Personal Apple installation and broader device qualification remain pending.

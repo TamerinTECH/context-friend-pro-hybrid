@@ -1,31 +1,38 @@
-# ContextFriend Pro
+# ContextFriend Pro Hybrid
 
-Native, offline Android and iPhone/iPad meeting companion.
+**Meeting notes for teachers, where the conversation never has to leave the phone.**
 
-Record → process on this device → review and correct → approve a version → share
-selected content directly. No central server, account or cloud inference.
+ContextFriend Pro records a school meeting, such as a parent–teacher conference, a
+support-plan meeting or a counselling session. It transcribes the meeting, tells the
+speakers apart and writes sourced notes, all on the phone. The cloud is used only when
+the teacher asks for it: names are replaced on the device first, the teacher sees exactly
+what will be sent, and the answer is put back together on the phone.
 
-Prototype: Android debug and unsigned release builds pass locally and on AWS,
-with eight automated tests passing on both an emulator and a physical Pixel 8 Pro.
-Apple simulator and device builds pass, with six tests passing on both an iOS
-simulator and a physical iPhone X (iOS 16.7.11).
-Personal Apple installation still requires signing; broader device qualification
-remains pending. See the
-[test report](docs/TEST_REPORT.md) for evidence and known limitations.
+> **Status (22 Nov 2026): work in progress** for #BuildHybridAI 2026, the Firebase AI
+> Logic hybrid hackathon. The native recorder in the first commit is disclosed
+> pre-existing work ([docs/PRE_EXISTING.md](docs/PRE_EXISTING.md)). What is built during
+> the hackathon is listed in [CHANGELOG.md](CHANGELOG.md). This README only lists features
+> that are built and tested; planned ones are marked as planned.
 
-- [Original brief](docs/ORIGINAL_BRIEF.md)
-- [Current status and next-session checklist](docs/HANDOFF.md)
-- [Product and architecture decisions](docs/DECISIONS.md)
-- [Build and provisioning](docs/BUILD.md)
-- [AWS builds, device tests, costs and resumption](docs/AWS_BUILDS.md)
-- [Architecture](docs/ARCHITECTURE.md)
-- [Device qualification plan](docs/TEST_PLAN.md)
-- [Privacy and threat model](docs/PRIVACY_AND_THREAT_MODEL.md)
-- [Wire protocol](shared/PROTOCOL.md)
-- [Third-party notices](THIRD_PARTY_NOTICES.md)
+## How the work is split
 
-Android: `android/`. iPhone/iPad: `apple/`. Portable inference: `native/`.
-Shared protocols, manifests and fixtures: `shared/`. Reproducible tooling: `tools/`.
+| Step | Where it runs | Engine |
+|---|---|---|
+| Record, store | Phone, encrypted vault | Native Android audio + libsodium |
+| Transcribe | Phone | whisper.cpp (ContextFriend engine) |
+| Tell speakers apart | Phone | sherpa-onnx: pyannote segmentation + TitaNet-S |
+| Meeting notes | Phone | **Gemini Nano via Firebase AI Logic, `ONLY_ON_DEVICE`** *(planned)*; Gemma 4 E2B via llama.cpp for other languages |
+| Better notes, if the teacher asks | Cloud, EU region | **Gemini via Firebase AI Logic**, redacted text only, with consent *(planned)* |
+| Share | Phone to phone (QR, Bluetooth, local network); optional end-to-end-encrypted cloud link *(planned)* | libsodium; Firestore stores ciphertext only |
 
-Voice profiles can be reused locally and explicitly copied between your devices.
-They never accompany an ordinary shared meeting. Each accepted copy is independent.
+## Licence
+
+Apache-2.0, see [LICENSE](LICENSE) and [NOTICE](NOTICE). Third-party components:
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+## More
+
+- [Decisions](docs/DECISIONS.md) · [Architecture](docs/ARCHITECTURE.md) ·
+  [Privacy and threat model](docs/PRIVACY_AND_THREAT_MODEL.md)
+- [Build](docs/BUILD.md) · [Test report](docs/TEST_REPORT.md) ·
+  [Original prototype brief](docs/ORIGINAL_BRIEF.md)

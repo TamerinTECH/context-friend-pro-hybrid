@@ -1,9 +1,7 @@
 # Build and personal installation
 
-This repository is independent of `../context-friend`. Do not run its deployment
-workflows, copy production environments, or start its servers for this app.
-For the authorized AWS build/test environment, costs and resume commands, see
-[AWS_BUILDS.md](AWS_BUILDS.md).
+This repository is independent of the ContextFriend school product. The prototype's AWS
+build and device-test runbook stayed in the private prototype repository.
 
 ## Provision once while online
 
@@ -25,7 +23,7 @@ Set the SDK path in untracked `android/local.properties` (`sdk.dir=...`) or
 Debug uses a local development signing key. Release is **unsigned** unless the untracked
 `android/local.properties` names the Play upload key (`upload.storeFile`,
 `upload.storePassword`, `upload.keyAlias`); then `:app:bundleRelease` writes the signed
-bundle for Play. See [PLAY_STORE.md](PLAY_STORE.md). Install debug with `adb install -r <app-debug.apk>` on an explicitly connected,
+bundle for Play. Install debug with `adb install -r <app-debug.apk>` on an explicitly connected,
 USB-debugging-authorized phone. Models are not bundled into the app.
 
 `bootstrap.py` checks exact Git revisions and the sherpa AAR hash.

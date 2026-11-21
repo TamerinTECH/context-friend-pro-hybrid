@@ -27,3 +27,13 @@ apple/Frameworks/
 android/app/src/androidTest/assets/*.bin
 android/app/src/androidTest/assets/*.onnx
 apple/ContextFriendProTests/Fixtures/
+# Firebase and local secrets (never commit)
+google-services.json
+GoogleService-Info.plist
+.env*
+!.env.example
+.firebase/
+firebase-debug.log
+*.log
+.worktrees/
+**/.kotlin/
