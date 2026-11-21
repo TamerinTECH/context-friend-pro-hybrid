@@ -14,3 +14,20 @@ Hackathon work for #BuildHybridAI 2026. The first commit is disclosed pre-existi
   (`Policy.kt`), meeting templates and prompts (`Prompts.kt`). 55 unit tests with
   synthetic data, including a check that a cloud prompt contains none of the fixture's
   names or identifiers.
+- Hybrid notes engine: Gemini Nano through Firebase AI Logic with `ONLY_ON_DEVICE`
+  (Gemini Nano 4 preview option, JSON output, BUSY back-off, inference source checked on
+  every answer), the prototype's Gemma 4 engine as the local alternative, chosen by policy.
+  Map-reduce notes moved into a model-independent `Notes.kt`.
+- Opt-in cloud notes: `CloudDraft` prepares the exact outgoing prompt on the device, the
+  policy gate runs again right before sending, the answer is re-identified locally. Cloud
+  backend: Vertex AI (Agent Platform) in an EU region, `ONLY_IN_CLOUD`.
+- Firebase services: App Check (debug provider in debug builds, Play Integrity in release),
+  anonymous Authentication, Remote Config (kill switch, cloud model, Nano option, chunk
+  size, extra protected terms).
+- Local privacy audit log (metadata only, encrypted in the vault, exportable as JSON).
+- UI: AI & privacy screen (Gemini Nano status and download, engines, names to protect,
+  privacy log), "where it ran" badge, meeting templates (parent–teacher, support plan,
+  counselling, staff, medical, legal), privacy panel with the exact outgoing text, tap-to-
+  redact name hints and consent. English, German and Hebrew strings.
+- 71 unit tests, including the full notes pipeline with a fake model and proofs that the
+  cloud model is never called without consent or with the kill switch on.

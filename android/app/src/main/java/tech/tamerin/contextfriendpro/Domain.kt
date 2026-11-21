@@ -34,7 +34,9 @@ fun validId(s: String): Boolean = runCatching { UUID.fromString(s).toString() ==
     val editedSummary: String? = null, val revision: String = newId(), val approvedRevision: String? = null,
     val history: List<Revision> = emptyList(), val stages: Map<String,Stage> = emptyMap(), val speakers: Map<String,String> = emptyMap(),
     val suggestedProfiles: Map<String,String> = emptyMap(), val speakerVectors: Map<String,List<Float>> = emptyMap(), val audioRetained: Boolean = true, val received: Boolean = false,
-    val senderStatus: String? = null, val sourceBundle: String? = null) {
+    val senderStatus: String? = null, val sourceBundle: String? = null,
+    /** Hackathon edition: meeting template id and where the current notes came from. */
+    val template: String = "general", val notes: NotesProvenance? = null) {
     val approved: Boolean get() = approvedRevision == revision
     fun edited(): Session = copy(revision = newId(), approvedRevision = null, state = "needs_review",
         history = (history + Revision(revision,transcript,summary,editedSummary,approved)).takeLast(20))
@@ -49,7 +51,11 @@ fun validId(s: String): Boolean = runCatching { UUID.fromString(s).toString() ==
         preprocessing == "mono16k-f32-sherpa-v1" && consentVersion == 1) }
 }
 @Serializable data class Preferences(val language: String = "en", val matching: Boolean = false, val appLock: Boolean = false,
-    val deleteAudioAfterApproval: Boolean = false, val asrModel: String = "whisper-tiny", val summaryModel: String = "gemma4-e2b")
+    val deleteAudioAfterApproval: Boolean = false, val asrModel: String = "whisper-tiny", val summaryModel: String = "gemma4-e2b",
+    /** On-device notes engine: AUTO, GEMINI_NANO or GEMMA_LOCAL. The cloud is never a preference, only a per-request action. */
+    val engine: String = "AUTO",
+    /** Names to protect (for example a class roster). Local only; used by the redaction before any cloud request. */
+    val people: List<String> = emptyList())
 
 fun cosine(a: List<Float>, b: List<Float>): Float {
     if(a.size != b.size || a.isEmpty()) return -1f

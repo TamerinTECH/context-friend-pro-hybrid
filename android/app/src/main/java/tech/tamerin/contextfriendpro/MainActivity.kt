@@ -67,7 +67,7 @@ class MainActivity: ComponentActivity() {
                     LinearProgressIndicator(progress={recording.level},modifier=Modifier.fillMaxWidth())
                     Row {Button(onClick={app.startService(Intent(app,RecordingService::class.java).setAction(if(recording.state=="paused")"resume"else "pause"))}){Text(t(if(recording.state=="paused")"resume"else "pause"))};Spacer(Modifier.width(12.dp));Button(onClick={app.startService(Intent(app,RecordingService::class.java).setAction("stop"))}){Text(t("stop"))}}
                 }
-                Row(Modifier.horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.spacedBy(6.dp)) {listOf("sessions","models","profiles","transfer","settings").forEach {name ->FilterChip(selected=tab==name,onClick={tab=name;selected=null},label={Text(t(name))})}}
+                Row(Modifier.horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.spacedBy(6.dp)) {listOf("sessions","ai","models","profiles","transfer","settings").forEach {name ->FilterChip(selected=tab==name,onClick={tab=name;selected=null},label={Text(t(name))})}}
                 Box(Modifier.weight(1f)) {
                     when(tab) {
                         "sessions" -> {
@@ -76,8 +76,9 @@ class MainActivity: ComponentActivity() {
                                 Button(enabled=recording.sessionId==null && processing==null,onClick={permission.launch(arrayOf(Manifest.permission.RECORD_AUDIO,Manifest.permission.POST_NOTIFICATIONS))}) {Text(t("start"))}
                                 if(sessions.isEmpty())Text(t("no_sessions"),Modifier.padding(vertical=24.dp))
                                 LazyColumn(verticalArrangement=Arrangement.spacedBy(8.dp)) {items(sessions,key={it.id}) {s ->Card(onClick={selected=s.id},modifier=Modifier.fillMaxWidth()) {Column(Modifier.padding(16.dp)) {Text(s.title,style=MaterialTheme.typography.titleMedium);Text(DateFormat.getDateTimeInstance(DateFormat.MEDIUM,DateFormat.SHORT).format(Date(s.createdAt)));Text(if(s.approved)t("approved")else t("state_${s.state}"))}}}}
-                            } else SessionView(app,current,processing==current.id,recording.sessionId!=null,t,act,onBack={selected=null},onProcess={scope.launch {engine.run(current.id)}},onCancel={engine.cancel()},onShare={tab="transfer"})
+                            } else SessionView(app,current,processing==current.id,recording.sessionId!=null,t,act,engine,onBack={selected=null},onProcess={scope.launch {engine.run(current.id)}},onCancel={engine.cancel()},onShare={tab="transfer"})
                         }
+                        "ai" -> AiPrivacyView(app,t,act)
                         "models" -> ModelView(app,t,act)
                         "profiles" -> ProfilesView(app,t,act)
                         "transfer" -> TransferView(app,sessions.firstOrNull {it.id==selected},t,act)
@@ -102,18 +103,24 @@ class MainActivity: ComponentActivity() {
 @Composable fun Toggle(label: String,value: Boolean,onChange: (Boolean)->Unit) {Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){Text(label,Modifier.weight(1f).padding(top=12.dp));Switch(checked=value,onCheckedChange=onChange)}}
 fun time(ms: Long)="%02d:%02d".format(ms/60000,(ms/1000)%60)
 
-@Composable fun SessionView(app: ProApp,s: Session,busy: Boolean,recording: Boolean,t: CopyText,act: (suspend ()->Unit)->Unit,onBack: ()->Unit,onProcess: ()->Unit,onCancel: ()->Unit,onShare: ()->Unit) {
+@Composable fun SessionView(app: ProApp,s: Session,busy: Boolean,recording: Boolean,t: CopyText,act: (suspend ()->Unit)->Unit,engine: Processing,onBack: ()->Unit,onProcess: ()->Unit,onCancel: ()->Unit,onShare: ()->Unit) {
     var section by remember {mutableStateOf("summary")};var edit by remember {mutableStateOf(false)};var draft by remember(s.revision){mutableStateOf(s.summaryText())}
     var deletion by remember {mutableStateOf<String?>(null)};var export by remember {mutableStateOf(false)};var enroll by remember {mutableStateOf<String?>(null)}
     var playing by remember {mutableStateOf(false)};val stopPlay=remember {AtomicBoolean(false)}
+    var cloudPanel by remember {mutableStateOf(false)};var cloudResult by remember {mutableStateOf<String?>(null)}
     val listState=rememberLazyListState();var focus by remember {mutableStateOf<String?>(null)}
     LaunchedEffect(section,focus) {if(section=="transcript" && focus!=null){val index=s.transcript.indexOfFirst {it.id==focus};if(index>=0)listState.scrollToItem(index)}}
     DisposableEffect(Unit){onDispose {stopPlay.set(true)}}
     Column {
         TextButton(onClick=onBack){Text(t("back"))};Text(s.title,style=MaterialTheme.typography.headlineSmall)
         Text(if(s.approved)t("approved")else t("state_${s.state}"));Text(t("disclaimer"),style=MaterialTheme.typography.labelSmall)
+        KeepScreenOn(busy)
+        s.notes?.let {NotesBadge(it,t)}
+        if(!busy)s.stages.values.firstOrNull {it.state=="failed" && it.error!=null}?.error?.let {code->Text(t("reason_$code"),color=MaterialTheme.colorScheme.error,style=MaterialTheme.typography.bodySmall)}
+        if(!s.received && s.audioRetained)TemplatePicker(app,s,!busy && !recording,t,act)
         Row(Modifier.horizontalScroll(rememberScrollState())) {
             if(busy)TextButton(onClick=onCancel){Text(t("cancel_processing"))}else if(!s.received && s.audioRetained)TextButton(enabled=!recording,onClick=onProcess){Text(t("process"))}
+            if(!s.received && s.transcript.isNotEmpty() && Hybrid.configured)TextButton(enabled=!busy && !recording,onClick={cloudPanel=true}){Text(t("cloud_improve"))}
             if(s.audioRetained)TextButton(onClick={if(playing){stopPlay.set(true)}else {playing=true;stopPlay.set(false);act {try{play(app,s,stopPlay)}finally {playing=false}}}}){Text(t(if(playing)"stop"else "play"))}
             TextButton(enabled=!busy && !recording,onClick={deletion="session"}){Text(t("delete"))}
             if(s.audioRetained)TextButton(enabled=!busy && !recording,onClick={deletion="audio"}){Text(t("delete_audio"))}
@@ -148,6 +155,8 @@ fun time(ms: Long)="%02d:%02d".format(ms/60000,(ms/1000)%60)
             }
         }
     }
+    if(cloudPanel)CloudPanel(app,s,engine,t) {result->cloudPanel=false;cloudResult=result}
+    cloudResult?.let {result->AlertDialog(onDismissRequest={cloudResult=null},text={Text(if(result=="sent")t("cloud_sent")else t("reason_$result"))},confirmButton={TextButton(onClick={cloudResult=null}){Text(t("close"))}})}
     if(deletion!=null)AlertDialog(onDismissRequest={deletion=null},text={Text(t("confirm_delete"))},confirmButton={TextButton(onClick={val what=deletion;deletion=null;stopPlay.set(true);act {if(what=="audio")app.vault.deleteAudio(s.id)else app.vault.delete(s.id)}}){Text(t("delete"))}},dismissButton={TextButton(onClick={deletion=null}){Text(t("cancel"))}})
     if(export)AlertDialog(onDismissRequest={export=false},text={Text(t("external_notice"))},confirmButton={TextButton(onClick={export=false;app.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT,(if(s.approved)""else t("draft")+"\n")+s.summaryText()),t("external_export")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))}){Text(t("external_export"))}},dismissButton={TextButton(onClick={export=false}){Text(t("cancel"))}})
     if(enroll!=null) {var consent by remember {mutableStateOf(false)};var name by remember {mutableStateOf("")}
