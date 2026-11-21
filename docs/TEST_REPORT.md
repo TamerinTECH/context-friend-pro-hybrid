@@ -317,3 +317,22 @@ Limits that remain:
 
 Evidence on this PC, outside Git: `F:\context-friend-pro\logs\` (`final-bundle-*`, `release-*`,
 `flow-rapid-before-fix.log`).
+
+## #BuildHybridAI edition — 22 November 2026
+
+Hackathon work (docs/PRE_EXISTING.md). Host: Windows 11, JDK 21 (Android Studio JBR), Gradle 8.13,
+Kotlin 2.4.0, Firebase BoM 35.2.0, firebase-ai 18.2.0, firebase-ai-ondevice 16.0.0-beta08.
+
+| Check | Result | Where |
+|---|---|---|
+| JVM unit tests (`:app:testDebugUnitTest`) | **75/75 PASS** (Redaction 34, Policy 21, Notes 9, CloudDraft 7, ShareLink 4) | Host and GitHub Actions |
+| Debug APK, release Kotlin compile | PASS | Host |
+| UI smoke test, no Firebase options in the build | PASS: AI & privacy screen shows "Firebase is not configured" for Gemini Nano and the cloud, the ContextFriend engine as installed; meeting types shown; cloud button hidden | Emulator `ContextFriendPro`, Android 15, x86_64 |
+| `EndToEndTest#recordedSpeechBecomesTranscriptAndSummary` | **PASS**, 612 s on a debug (unoptimised native) build: Whisper transcript, speaker stage, notes through the new policy-routed pipeline; policy chose `gemma-local` (`auto_nano_not_ready`); provenance and audit entry recorded; audit log contains no transcript words | Same emulator |
+
+Not yet run: anything with Gemini Nano (needs a Gemini Nano 4 phone and the AICore Developer
+Preview), the cloud path and the encrypted links (need the Firebase project), offline behaviour of
+Firebase AI Logic's on-device path. These are tracked in docs/SUBMISSION_CHECKLIST.md.
+
+Observation: with the generic template, Gemma used the template line as the title. The prompt now
+asks for a title that names the topic.

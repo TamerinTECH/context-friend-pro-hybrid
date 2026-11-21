@@ -19,6 +19,7 @@ copyright and attribution when redistributing binaries or models. The generated 
 | JNA | 5.17.0 | dual LGPL-2.1-or-later / Apache-2.0, [license](https://github.com/java-native-access/jna/blob/5.17.0/LICENSE); Apache option |
 | ZXing core | 3.5.3 | Apache-2.0, [source](https://github.com/zxing/zxing) |
 | Kotlin + serialization / coroutines | Kotlin 2.1.20; serialization 1.8.1; coroutines 1.10.2 | Apache-2.0 |
+| Firebase Android SDKs (AI Logic, AI Logic on-device, App Check, Auth, Firestore, Remote Config) | BoM 35.2.0; firebase-ai 18.2.0; firebase-ai-ondevice 16.0.0-beta08 | Apache-2.0, [source](https://github.com/firebase/firebase-android-sdk); on-device inference is governed by the ML Kit / Gen AI ML Kit terms |
 | AndroidX / Compose / Material3 | versions pinned in app Gradle; BOM 2025.05.01 | Apache-2.0 |
 
 Android build: AGP 8.13.1, Gradle 8.13, NDK 27.1.12297006, CMake 3.22.1, JDK 21.
