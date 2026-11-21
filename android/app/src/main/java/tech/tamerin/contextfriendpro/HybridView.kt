@@ -61,6 +61,9 @@ private val CloudBlue = Color(0xff245ca8)
     }
 }
 
+/** "eu" is the Vertex AI multi-region endpoint: data residency and ML processing within EU member states. */
+fun regionLabel(t: CopyText) = if (Hybrid.location == "eu") t("region_eu") else Hybrid.location
+
 @Composable fun KeepScreenOn(on: Boolean) {
     // Gemini Nano runs only while the app is the top foreground app (ML Kit Prompt API).
     val view = LocalView.current
@@ -89,7 +92,7 @@ private val CloudBlue = Color(0xff245ca8)
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 val d = draft.getOrNull()
                 if (d == null) { Text(t("reason_" + (draft.exceptionOrNull()?.message ?: "cloud_failed"))); return@Column }
-                Text(t("cloud_note").replace("{region}", Hybrid.location), style = MaterialTheme.typography.bodySmall)
+                Text(t("cloud_note").replace("{region}", regionLabel(t)), style = MaterialTheme.typography.bodySmall)
                 Text(t("cloud_replaced") + ": " + if (d.counts.isEmpty()) "0" else d.counts.entries.joinToString { "${it.value} " + t("entity_${it.key.name}") })
                 if (d.risk.possibleNames.isNotEmpty()) {
                     Text(t("cloud_possible_names"), style = MaterialTheme.typography.labelMedium)
@@ -170,8 +173,8 @@ private val CloudBlue = Color(0xff245ca8)
                 else -> "cloud_state_on"
             }
             EngineCard("☁", t("cloud_title"), t(state), CloudBlue) {
-                Text(t("cloud_note").replace("{region}", Hybrid.location), style = MaterialTheme.typography.labelSmall)
-                Text("${config.cloudModel} · ${Hybrid.location}", style = MaterialTheme.typography.labelSmall)
+                Text(t("cloud_note").replace("{region}", regionLabel(t)), style = MaterialTheme.typography.labelSmall)
+                Text("${config.cloudModel} · ${Hybrid.location} (Vertex AI / Agent Platform)", style = MaterialTheme.typography.labelSmall)
             }
         }
         item {

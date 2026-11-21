@@ -38,7 +38,7 @@ class MainActivity: ComponentActivity() {
     private var unlockInProgress=false
     private val unlock=registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {result ->unlockInProgress=false;locked.value=result.resultCode!=RESULT_OK}
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState);window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        super.onCreate(savedInstanceState);applyScreenCapture(this,runCatching {app.vault.preferences().allowScreenCapture}.getOrDefault(false))
         locked.value=app.vault.preferences().appLock
         setContent {if(locked.value) Button(onClick={unlockApp()}) {Text("ContextFriend Pro · Unlock / Entsperren / פתיחה")} else ProInterface(app)}
     }
@@ -52,7 +52,7 @@ class MainActivity: ComponentActivity() {
     val t: CopyText={key -> dictionaries[locale]?.get(key) ?: dictionaries.getValue("en")[key] ?: key}
     var sessions by remember {mutableStateOf<List<Session>>(emptyList())};var selected by remember {mutableStateOf<String?>(null)}
     var tab by remember {mutableStateOf("sessions")};var error by remember {mutableStateOf(false)};var startDialog by remember {mutableStateOf(false)}
-    val scope=rememberCoroutineScope();val engine=remember {Processing(app)}
+    val scope=rememberCoroutineScope();val engine=remember {Processing(app)};val activity=androidx.compose.ui.platform.LocalContext.current as? android.app.Activity
     val act: (suspend ()->Unit)->Unit={block -> scope.launch {try {withContext(Dispatchers.IO) {block()};app.changed()}catch(_:Exception){error=true}}}
     // A new change cancels the list still loading. That is not a failure, and runCatching would report it as one.
     LaunchedEffect(generation) {try {sessions=withContext(Dispatchers.IO){app.vault.list()}}catch(e: CancellationException){throw e}catch(_: Exception){error=true};pref=app.vault.preferences()}
@@ -87,6 +87,8 @@ class MainActivity: ComponentActivity() {
                             Toggle(t("matching"),pref.matching) {pref=pref.copy(matching=it);act {app.vault.putPrivate("preferences",json.encodeToString(pref))}}
                             Toggle(t("lock"),pref.appLock) {value ->if(!value || app.getSystemService(KeyguardManager::class.java).isDeviceSecure){pref=pref.copy(appLock=value);act {app.vault.putPrivate("preferences",json.encodeToString(pref))}}else error=true}
                             Toggle(t("retention"),pref.deleteAudioAfterApproval) {pref=pref.copy(deleteAudioAfterApproval=it);act {app.vault.putPrivate("preferences",json.encodeToString(pref))}}
+                            Toggle(t("screen_capture"),pref.allowScreenCapture) {pref=pref.copy(allowScreenCapture=it);activity?.let {a->applyScreenCapture(a,pref.allowScreenCapture)};act {app.vault.putPrivate("preferences",json.encodeToString(pref))}}
+                            Text(t("screen_capture_note"),style=MaterialTheme.typography.labelSmall)
                             Text(t("loss_notice"));Text(t("profile_notice"));Text(t("disclaimer"))
                         }
                     }
@@ -100,6 +102,8 @@ class MainActivity: ComponentActivity() {
         }
     }
 }
+/** FLAG_SECURE unless the user allowed screen capture in Settings. */
+fun applyScreenCapture(activity: android.app.Activity,allowed: Boolean) {if(allowed)activity.window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)else activity.window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)}
 @Composable fun Toggle(label: String,value: Boolean,onChange: (Boolean)->Unit) {Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){Text(label,Modifier.weight(1f).padding(top=12.dp));Switch(checked=value,onCheckedChange=onChange)}}
 fun time(ms: Long)="%02d:%02d".format(ms/60000,(ms/1000)%60)
 

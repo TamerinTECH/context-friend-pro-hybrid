@@ -25,7 +25,7 @@ android {
         buildConfigField("String", "FIREBASE_APP_ID", firebase("appId"))
         buildConfigField("String", "FIREBASE_PROJECT_ID", firebase("projectId"))
         buildConfigField("String", "FIREBASE_SENDER_ID", firebase("senderId"))
-        buildConfigField("String", "VERTEX_LOCATION", "\"" + (localProperties.getProperty("firebase.vertexLocation") ?: "europe-west4") + "\"")
+        buildConfigField("String", "VERTEX_LOCATION", "\"" + (localProperties.getProperty("firebase.vertexLocation") ?: "eu") + "\"")
         ndk { abiFilters += listOf("arm64-v8a", "x86_64") }
         externalNativeBuild { cmake { cppFlags += "-std=c++17"; arguments += "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON" } }
     }

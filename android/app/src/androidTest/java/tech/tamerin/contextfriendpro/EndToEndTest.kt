@@ -66,6 +66,11 @@ class EndToEndTest {
             key.fill(0)
             val done=process(s.id);assertSummarized(done)
             assertTrue(done.transcript.joinToString(" ") {it.text}.lowercase().contains("country"))
+            // Hackathon edition: the notes record where they ran, and the audit log holds metadata only.
+            val notes=done.notes!!;Log.i("CFE2E","notes: $notes")
+            assertTrue(NotesEngine.of(notes.engine).onDevice);assertEquals(0,notes.cloudCalls)
+            val audit=Audit.export(app.vault);Log.i("CFE2E","audit: ${Audit.list(app.vault).last()}")
+            assertTrue(audit.contains(Audit.meetingRef(s.id)));assertFalse(audit.lowercase().contains("country"))
         } finally {app.vault.delete(s.id)}
     }
     /** Whisper labels quiet audio [BLANK_AUDIO]. Pure zeros never reach it (engine.cpp), but a real room is never pure zeros. */

@@ -187,7 +187,10 @@
     "reason_gemma_needs_more_memory": "Not enough free memory for the ContextFriend engine.",
     "reason_no_on_device_engine": "No on-device notes engine is ready. Open AI & privacy.",
     "reason_stage_failed_retry_or_check_models": "Processing failed. Try again, or check Models.",
-    "reason_cancelled": "Processing was cancelled."
+    "reason_cancelled": "Processing was cancelled.",
+    "screen_capture": "Allow screenshots and screen recording",
+    "screen_capture_note": "Off by default, so other apps cannot capture meeting content. Turn it on to share your screen or record a demo.",
+    "region_eu": "the EU"
   },
   "de": {
     "app_name": "ContextFriend Pro",
@@ -377,7 +380,10 @@
     "reason_gemma_needs_more_memory": "Zu wenig freier Speicher für die ContextFriend-Engine.",
     "reason_no_on_device_engine": "Keine Notiz-Engine auf dem Handy bereit. KI & Datenschutz öffnen.",
     "reason_stage_failed_retry_or_check_models": "Verarbeitung fehlgeschlagen. Erneut versuchen oder Modelle prüfen.",
-    "reason_cancelled": "Verarbeitung abgebrochen."
+    "reason_cancelled": "Verarbeitung abgebrochen.",
+    "screen_capture": "Bildschirmfotos und Bildschirmaufnahmen erlauben",
+    "screen_capture_note": "Standardmäßig aus, damit andere Apps keine Besprechungsinhalte aufnehmen können. Zum Teilen des Bildschirms oder für eine Demo einschalten.",
+    "region_eu": "der EU"
   },
   "he": {
     "app_name": "ContextFriend Pro",
@@ -567,6 +573,9 @@
     "reason_gemma_needs_more_memory": "אין מספיק זיכרון פנוי למנוע ContextFriend.",
     "reason_no_on_device_engine": "אין מנוע סיכום מוכן בטלפון. פתחו את מסך הפרטיות.",
     "reason_stage_failed_retry_or_check_models": "העיבוד נכשל. נסו שוב או בדקו את המודלים.",
-    "reason_cancelled": "העיבוד בוטל."
+    "reason_cancelled": "העיבוד בוטל.",
+    "screen_capture": "לאפשר צילומי מסך והקלטת מסך",
+    "screen_capture_note": "כבוי כברירת מחדל, כדי שאפליקציות אחרות לא יצלמו תוכן פגישות. הפעילו כדי לשתף מסך או להקליט הדגמה.",
+    "region_eu": "האיחוד האירופי"
   }
 }

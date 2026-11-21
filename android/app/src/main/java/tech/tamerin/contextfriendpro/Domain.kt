@@ -55,7 +55,9 @@ fun validId(s: String): Boolean = runCatching { UUID.fromString(s).toString() ==
     /** On-device notes engine: AUTO, GEMINI_NANO or GEMMA_LOCAL. The cloud is never a preference, only a per-request action. */
     val engine: String = "AUTO",
     /** Names to protect (for example a class roster). Local only; used by the redaction before any cloud request. */
-    val people: List<String> = emptyList())
+    val people: List<String> = emptyList(),
+    /** Off by default (FLAG_SECURE). On lets the user share the screen or record a demo. */
+    val allowScreenCapture: Boolean = false)
 
 fun cosine(a: List<Float>, b: List<Float>): Float {
     if(a.size != b.size || a.isEmpty()) return -1f
