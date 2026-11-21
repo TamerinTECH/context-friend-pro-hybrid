@@ -31,3 +31,10 @@ Hackathon work for #BuildHybridAI 2026. The first commit is disclosed pre-existi
   redact name hints and consent. English, German and Hebrew strings.
 - 71 unit tests, including the full notes pipeline with a fake model and proofs that the
   cloud model is never called without consent or with the kill switch on.
+- CI on GitHub Actions (JVM unit tests). Opt-in "allow screen capture" setting (FLAG_SECURE
+  stays the default). Default cloud location `eu`, the Vertex AI multi-region with EU data
+  residency and in-EU ML processing.
+- Encrypted cloud links ("hybrid if desired"): notes text only, XChaCha20-Poly1305 on the
+  phone, Firestore stores ciphertext for at most 7 days; link or QR `CFS1:<id>:<key>`; the
+  recipient decrypts locally. Firestore rules allow only that document shape and no listing.
+  Remote Config template and `firebase.json` for deployment. 75 unit tests.

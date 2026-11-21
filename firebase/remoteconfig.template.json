@@ -1,0 +1,29 @@
+{
+  "parameters": {
+    "cloud_enabled": {
+      "defaultValue": { "value": "true" },
+      "valueType": "BOOLEAN",
+      "description": "Kill switch. false = local-only mode: no cloud notes request is possible. Consent can never be switched off."
+    },
+    "cloud_model": {
+      "defaultValue": { "value": "gemini-4-hydrogen" },
+      "valueType": "STRING",
+      "description": "Cloud Gemini model for opt-in redacted notes (Vertex AI / Agent Platform backend)."
+    },
+    "nano_model_option": {
+      "defaultValue": { "value": "PREVIEW" },
+      "valueType": "STRING",
+      "description": "On-device model option: STABLE, PREVIEW (Gemini Nano 4 Full) or PREVIEW_FAST."
+    },
+    "nano_chunk_chars": {
+      "defaultValue": { "value": "3500" },
+      "valueType": "NUMBER",
+      "description": "Transcript characters per Gemini Nano request (whole request limit: 4,000 tokens). Clamped to 1000-8000 in the app."
+    },
+    "extra_protected_terms": {
+      "defaultValue": { "value": "[]" },
+      "valueType": "JSON",
+      "description": "Extra words always replaced before a cloud request, e.g. a school's own name. JSON array of strings. Never personal data."
+    }
+  }
+}

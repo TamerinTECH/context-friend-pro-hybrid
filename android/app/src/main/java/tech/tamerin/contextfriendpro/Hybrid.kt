@@ -47,6 +47,7 @@ object Hybrid {
         private set
 
     val ready: Boolean get() = firebase != null
+    fun firebaseApp(): FirebaseApp? = firebase
     val location: String get() = BuildConfig.VERTEX_LOCATION
 
     fun init(context: Context) {

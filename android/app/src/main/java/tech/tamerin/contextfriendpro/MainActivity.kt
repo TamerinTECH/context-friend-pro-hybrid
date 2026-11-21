@@ -51,7 +51,7 @@ class MainActivity: ComponentActivity() {
     val dictionaries=remember {json.decodeFromString<Map<String,Map<String,String>>>(app.assets.open("translations.json").bufferedReader().readText())}
     val t: CopyText={key -> dictionaries[locale]?.get(key) ?: dictionaries.getValue("en")[key] ?: key}
     var sessions by remember {mutableStateOf<List<Session>>(emptyList())};var selected by remember {mutableStateOf<String?>(null)}
-    var tab by remember {mutableStateOf("sessions")};var error by remember {mutableStateOf(false)};var startDialog by remember {mutableStateOf(false)}
+    var tab by remember {mutableStateOf("sessions")};var error by remember {mutableStateOf(false)};var startDialog by remember {mutableStateOf(false)};var openLink by remember {mutableStateOf(false)}
     val scope=rememberCoroutineScope();val engine=remember {Processing(app)};val activity=androidx.compose.ui.platform.LocalContext.current as? android.app.Activity
     val act: (suspend ()->Unit)->Unit={block -> scope.launch {try {withContext(Dispatchers.IO) {block()};app.changed()}catch(_:Exception){error=true}}}
     // A new change cancels the list still loading. That is not a failure, and runCatching would report it as one.
@@ -73,7 +73,10 @@ class MainActivity: ComponentActivity() {
                         "sessions" -> {
                             val current=sessions.firstOrNull {it.id==selected}
                             if(current==null) Column {
-                                Button(enabled=recording.sessionId==null && processing==null,onClick={permission.launch(arrayOf(Manifest.permission.RECORD_AUDIO,Manifest.permission.POST_NOTIFICATIONS))}) {Text(t("start"))}
+                                Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+                                    Button(enabled=recording.sessionId==null && processing==null,onClick={permission.launch(arrayOf(Manifest.permission.RECORD_AUDIO,Manifest.permission.POST_NOTIFICATIONS))}) {Text(t("start"))}
+                                    if(Hybrid.configured)OutlinedButton(onClick={openLink=true}) {Text(t("cloud_open"))}
+                                }
                                 if(sessions.isEmpty())Text(t("no_sessions"),Modifier.padding(vertical=24.dp))
                                 LazyColumn(verticalArrangement=Arrangement.spacedBy(8.dp)) {items(sessions,key={it.id}) {s ->Card(onClick={selected=s.id},modifier=Modifier.fillMaxWidth()) {Column(Modifier.padding(16.dp)) {Text(s.title,style=MaterialTheme.typography.titleMedium);Text(DateFormat.getDateTimeInstance(DateFormat.MEDIUM,DateFormat.SHORT).format(Date(s.createdAt)));Text(if(s.approved)t("approved")else t("state_${s.state}"))}}}}
                             } else SessionView(app,current,processing==current.id,recording.sessionId!=null,t,act,engine,onBack={selected=null},onProcess={scope.launch {engine.run(current.id)}},onCancel={engine.cancel()},onShare={tab="transfer"})
@@ -94,6 +97,7 @@ class MainActivity: ComponentActivity() {
                     }
                 }
             }}
+            if(openLink)OpenCloudLinkDialog(app,t,onOpened={id->openLink=false;tab="sessions";selected=id},onClose={openLink=false})
             if(error)AlertDialog(onDismissRequest={error=false},text={Text(t("error"))},confirmButton={TextButton(onClick={error=false}){Text(t("close"))}})
             if(startDialog) {var consent by remember {mutableStateOf(false)}
                 AlertDialog(onDismissRequest={startDialog=false},title={Text(t("start"))},text={Column {Text(t("record_notice"));Toggle(t("acknowledge"),consent){consent=it}}},
@@ -111,7 +115,7 @@ fun time(ms: Long)="%02d:%02d".format(ms/60000,(ms/1000)%60)
     var section by remember {mutableStateOf("summary")};var edit by remember {mutableStateOf(false)};var draft by remember(s.revision){mutableStateOf(s.summaryText())}
     var deletion by remember {mutableStateOf<String?>(null)};var export by remember {mutableStateOf(false)};var enroll by remember {mutableStateOf<String?>(null)}
     var playing by remember {mutableStateOf(false)};val stopPlay=remember {AtomicBoolean(false)}
-    var cloudPanel by remember {mutableStateOf(false)};var cloudResult by remember {mutableStateOf<String?>(null)}
+    var cloudPanel by remember {mutableStateOf(false)};var cloudResult by remember {mutableStateOf<String?>(null)};var cloudShare by remember {mutableStateOf(false)}
     val listState=rememberLazyListState();var focus by remember {mutableStateOf<String?>(null)}
     LaunchedEffect(section,focus) {if(section=="transcript" && focus!=null){val index=s.transcript.indexOfFirst {it.id==focus};if(index>=0)listState.scrollToItem(index)}}
     DisposableEffect(Unit){onDispose {stopPlay.set(true)}}
@@ -137,7 +141,7 @@ fun time(ms: Long)="%02d:%02d".format(ms/60000,(ms/1000)%60)
                 item {if(edit)OutlinedTextField(value=draft,onValueChange={draft=it},modifier=Modifier.fillMaxWidth().heightIn(min=250.dp),label={Text(t("summary"))})else Text(s.summaryText().ifBlank {t("empty_summary")})}
                 item {Row(Modifier.horizontalScroll(rememberScrollState())) {
                     if(edit) {TextButton(onClick={act {app.vault.update(s.id){it.edited().copy(editedSummary=draft)}};edit=false}){Text(t("save"))};TextButton(onClick={edit=false;draft=s.summaryText()}){Text(t("cancel"))}}
-                    else if(s.summaryText().isNotBlank()) {TextButton(enabled=!busy && !recording,onClick={edit=true}){Text(t("edit"))};TextButton(enabled=!busy && !recording && !s.approved,onClick={act {app.vault.update(s.id){require(it.revision==s.revision);it.copy(approvedRevision=s.revision)};if(app.vault.preferences().deleteAudioAfterApproval)app.vault.deleteAudio(s.id)}}){Text(t("approve"))};TextButton(onClick=onShare){Text(t("send"))};TextButton(onClick={export=true}){Text(t("external_export"))}}
+                    else if(s.summaryText().isNotBlank()) {TextButton(enabled=!busy && !recording,onClick={edit=true}){Text(t("edit"))};TextButton(enabled=!busy && !recording && !s.approved,onClick={act {app.vault.update(s.id){require(it.revision==s.revision);it.copy(approvedRevision=s.revision)};if(app.vault.preferences().deleteAudioAfterApproval)app.vault.deleteAudio(s.id)}}){Text(t("approve"))};TextButton(onClick=onShare){Text(t("send"))};if(Hybrid.configured)TextButton(onClick={cloudShare=true}){Text(t("cloud_share"))};TextButton(onClick={export=true}){Text(t("external_export"))}}
                 }}
                 s.summary?.let {summary -> items(summary.paragraphs+summary.decisions+summary.uncertainties+summary.actions.map {Statement(listOfNotNull(it.text,it.owner,it.due).joinToString(" · "),it.sources)}){st ->Column {Text(st.text);st.sources.forEach {source->TextButton(onClick={focus=source;section="transcript"}){Text(t("source")+" · "+(s.transcript.find {it.id==source}?.startMs?.let(::time)?:source.take(8)))}}}}}
             } else if(section=="transcript") {
@@ -160,6 +164,7 @@ fun time(ms: Long)="%02d:%02d".format(ms/60000,(ms/1000)%60)
         }
     }
     if(cloudPanel)CloudPanel(app,s,engine,t) {result->cloudPanel=false;cloudResult=result}
+    if(cloudShare)CloudShareDialog(app,s,t) {cloudShare=false}
     cloudResult?.let {result->AlertDialog(onDismissRequest={cloudResult=null},text={Text(if(result=="sent")t("cloud_sent")else t("reason_$result"))},confirmButton={TextButton(onClick={cloudResult=null}){Text(t("close"))}})}
     if(deletion!=null)AlertDialog(onDismissRequest={deletion=null},text={Text(t("confirm_delete"))},confirmButton={TextButton(onClick={val what=deletion;deletion=null;stopPlay.set(true);act {if(what=="audio")app.vault.deleteAudio(s.id)else app.vault.delete(s.id)}}){Text(t("delete"))}},dismissButton={TextButton(onClick={deletion=null}){Text(t("cancel"))}})
     if(export)AlertDialog(onDismissRequest={export=false},text={Text(t("external_notice"))},confirmButton={TextButton(onClick={export=false;app.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT,(if(s.approved)""else t("draft")+"\n")+s.summaryText()),t("external_export")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))}){Text(t("external_export"))}},dismissButton={TextButton(onClick={export=false}){Text(t("cancel"))}})
