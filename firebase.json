@@ -1,7 +1,14 @@
 {
   "firestore": {
+    "database": "(default)",
+    "location": "eur3",
     "rules": "firebase/firestore.rules",
     "indexes": "firebase/firestore.indexes.json"
+  },
+  "auth": {
+    "providers": {
+      "anonymous": true
+    }
   },
   "remoteconfig": {
     "template": "firebase/remoteconfig.template.json"

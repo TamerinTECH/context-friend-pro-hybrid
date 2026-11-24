@@ -6,7 +6,8 @@ Judging 10–16 Dec; the app and the Firebase project stay free and available un
 ## Ron (external actions; agents never do these)
 
 - [ ] Register for the hackathon on Devpost (entry on behalf of TamerinTECH GmbH, Ron as Representative).
-- [ ] `npx firebase-tools login` (and `gcloud auth login`) with the TamerinTECH Google account.
+- [x] `npx firebase-tools login` with the TamerinTECH Google account (24 Nov).
+- [ ] `gcloud auth login` (needed for the Vertex AI checks and budget commands).
 - [ ] Firebase console: upgrade the project to Blaze, budget alert €10; AI Logic → Get started →
       Agent Platform (Vertex AI) Gemini API. See FIREBASE_SETUP.md.
 - [ ] Pixel 11 Pro: AICore update + AICore Developer Preview; connect by USB with USB debugging.
@@ -23,15 +24,16 @@ Judging 10–16 Dec; the app and the Firebase project stay free and available un
 - [x] Public repo, Apache-2.0 detected, disclosure of pre-existing code, CHANGELOG.
 - [x] Firebase AI Logic imported and called at runtime (`Hybrid.kt`), per-task inference modes.
 - [x] Privacy core, policy, notes pipeline, cloud draft, encrypted links: 75 unit tests, CI green.
-- [ ] Firebase project wiring after Ron's login: Android app, local.properties, Firestore (eur3) +
-      rules + TTL, Remote Config template, anonymous Auth, App Check enforcement.
+- [x] Firebase project `contextfriend-pro-hybrid` (24 Nov): Android app, local.properties, Firestore
+      in eur3 + rules, Remote Config template, anonymous Auth.
+- [ ] After Blaze: Firestore TTL (`deploy --only firestore:indexes`), AI Logic, App Check enforcement.
 - [ ] Phone checks on the Pixel (fill in docs/TEST_REPORT.md with real numbers):
   - [ ] Gemini Nano 4 status, download, notes from the demo meeting; badge shows ON_DEVICE.
   - [ ] Offline (airplane mode): does Firebase AI Logic on-device work without network and App Check?
   - [ ] AICore quota/BUSY behaviour on a 30-minute recording.
   - [ ] Cloud notes via `eu`: placeholders out, names back; badge IN_CLOUD; audit entry.
-  - [ ] Remote Config kill switch → local-only mode.
-  - [ ] Encrypted link created on one phone, opened on another (or the emulator).
+  - [x] Remote Config kill switch → local-only mode (emulator, 24 Nov).
+  - [~] Encrypted link: created and opened on the emulator (24 Nov); phone ↔ emulator still to do.
 - [ ] Release APK signed, published as a GitHub Release with checksums.
 - [ ] README and TESTING.md: remove "(phone check pending)" markers or correct the claims.
 - [ ] Final scan: `git log -p` for keys, tokens, real names; no personal data anywhere.

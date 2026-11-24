@@ -47,7 +47,7 @@ and install it (allow installs from your browser or file manager). The app is fr
    back together on the phone; the badge then shows **☁ Cloud · Gemini, names replaced**. *(phone check pending)*
 6. **Encrypted cloud link** on the summary: the notes (never transcript or audio) are encrypted
    on the phone; Firestore stores only ciphertext for seven days. Open it on a second phone with
-   **Open cloud link** (scan the QR or paste the `CFS1:` text). *(phone check pending)*
+   **Open cloud link** (scan the QR or paste the `CFS1:` text). *(passed on the emulator, sender and receiver on one device; second phone pending)*
 7. **AI & privacy → Privacy log**: one line per AI request, where it ran, how many items were
    replaced, how many characters were sent. Never what was said. **Export log** gives the JSON.
 

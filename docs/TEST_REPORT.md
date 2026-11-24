@@ -336,3 +336,35 @@ Firebase AI Logic's on-device path. These are tracked in docs/SUBMISSION_CHECKLI
 
 Observation: with the generic template, Gemma used the template line as the title. The prompt now
 asks for a title that names the topic.
+
+## Firebase project connected — 24 November 2026
+
+Firebase project `contextfriend-pro-hybrid` (Spark plan until the Blaze upgrade), Android app
+`com.tamerintech.contextfriendpro`, set up by command line: Firestore `(default)` in **eur3**
+(read back: `locationId: eur3`), rules released, anonymous sign-in enabled, Remote Config template
+version 1 deployed. Debug build with the project's options from `local.properties`, same emulator.
+
+| Check | Result | Where |
+|---|---|---|
+| Firebase start from build options (no google-services.json) | PASS: Firebase, App Check debug provider, Remote Config and Auth start; `Default FirebaseApp failed to initialize` before that is expected, because the app initialises Firebase itself | Emulator, logcat |
+| Encrypted cloud link, create | **PASS**: anonymous sign-in, Firestore write accepted by the rules, which only allow exactly `v, ct, nonce, owner, createdAt, expiresAt`; QR and `CFS1:` text shown | Emulator |
+| Encrypted cloud link, open | **PASS**: pasted `CFS1:` link fetched, decrypted on the device and stored as a received, read-only meeting | Same emulator (sender and receiver on one device; a second device is still to do) |
+| Remote Config kill switch | **PASS**: `cloud_enabled=false` deployed → *Refresh* → "Switched off: local-only mode"; a consented Send was stopped by the policy gate ("The cloud is switched off. Notes stay on this phone."); `cloud_enabled=true` restored and read back | Emulator + live Remote Config |
+| Privacy log | PASS: `cloud_blocked · cloud_disabled`, `cloud_share_opened`, `cloud_share` (166 characters, `end_to_end_encrypted,ttl_7d`), metadata only | Emulator |
+| JVM unit tests | 75/75 PASS | Host |
+
+Defects found and fixed in this run:
+
+- Remote Config was read before its defaults were applied, so a first start without network
+  would have shown the cloud as off and used 0 as the Nano chunk size (clamped to 1,000). The first
+  read now waits for the defaults, and until then the kill switch stays closed.
+- A received meeting said "Audio was deleted" and offered *Approve*, *Send* and *Encrypted cloud
+  link*. It now says where the notes came from and offers only *Edit* and *Export*.
+- Tapping a switch's label did nothing; only the switch itself reacted. The whole row is now
+  the switch (also one element for screen readers).
+- With the kill switch on, the privacy panel still asked for consent before refusing. It now says
+  straight away that the cloud is switched off.
+
+Open: link creation took about 10 s because the unregistered App Check debug token was rejected
+first (App Check is not enforced yet). The Firestore TTL policy for `shares.expiresAt` needs the
+Blaze plan; it is defined in `firebase/firestore.indexes.json` and deploys after the upgrade.

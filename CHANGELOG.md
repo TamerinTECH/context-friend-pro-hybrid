@@ -3,6 +3,18 @@
 Hackathon work for #BuildHybridAI 2026. The first commit is disclosed pre-existing code
 (docs/PRE_EXISTING.md); everything listed here was built during the submission period.
 
+## 2026-11-24
+
+- Firebase project `contextfriend-pro-hybrid` connected: Firestore pinned to eur3 in
+  `firebase.json`, anonymous sign-in declared there too, TTL for expired links defined in
+  `firestore.indexes.json` (deploys after the Blaze upgrade).
+- Verified on the emulator against the live project: encrypted cloud link created and opened,
+  Remote Config kill switch, privacy log (docs/TEST_REPORT.md).
+- Fixes from that run: Remote Config is read only after its defaults are applied, and the kill
+  switch stays closed until then; received meetings say where they came from and cannot be
+  approved or re-shared; tapping a switch's label toggles it; the privacy panel says at once when
+  the cloud is switched off.
+
 ## 2026-11-22
 
 - Public repository, Apache-2.0 licence, disclosure of pre-existing code, hackathon

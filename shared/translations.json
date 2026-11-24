@@ -206,7 +206,9 @@
     "reason_share_wrong_key": "This link cannot be decrypted.",
     "reason_share_link_invalid": "This is not a valid CFS1 link.",
     "reason_share_too_large": "These notes are too large for a link.",
-    "reason_nothing_to_share": "There are no notes to share yet."
+    "reason_nothing_to_share": "There are no notes to share yet.",
+    "received_cloud": "Received through an encrypted cloud link. Only the notes were shared. The sender is not verified.",
+    "received_phone": "Received from another phone. The sender is not verified."
   },
   "de": {
     "app_name": "ContextFriend Pro",
@@ -415,7 +417,9 @@
     "reason_share_wrong_key": "Dieser Link lässt sich nicht entschlüsseln.",
     "reason_share_link_invalid": "Das ist kein gültiger CFS1-Link.",
     "reason_share_too_large": "Diese Notizen sind für einen Link zu groß.",
-    "reason_nothing_to_share": "Es gibt noch keine Notizen zum Teilen."
+    "reason_nothing_to_share": "Es gibt noch keine Notizen zum Teilen.",
+    "received_cloud": "Über einen verschlüsselten Cloud-Link empfangen. Geteilt wurden nur die Notizen. Der Absender ist nicht geprüft.",
+    "received_phone": "Von einem anderen Telefon empfangen. Der Absender ist nicht geprüft."
   },
   "he": {
     "app_name": "ContextFriend Pro",
@@ -624,6 +628,8 @@
     "reason_share_wrong_key": "אי אפשר לפענח את הקישור.",
     "reason_share_link_invalid": "זה לא קישור CFS1 תקין.",
     "reason_share_too_large": "הסיכום גדול מדי לקישור.",
-    "reason_nothing_to_share": "עדיין אין סיכום לשיתוף."
+    "reason_nothing_to_share": "עדיין אין סיכום לשיתוף.",
+    "received_cloud": "התקבל דרך קישור ענן מוצפן. שותפו רק הסיכומים. השולח לא אומת.",
+    "received_phone": "התקבל מטלפון אחר. השולח לא אומת."
   }
 }

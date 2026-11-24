@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.ui.semantics.Role
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -108,7 +110,8 @@ class MainActivity: ComponentActivity() {
 }
 /** FLAG_SECURE unless the user allowed screen capture in Settings. */
 fun applyScreenCapture(activity: android.app.Activity,allowed: Boolean) {if(allowed)activity.window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)else activity.window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)}
-@Composable fun Toggle(label: String,value: Boolean,onChange: (Boolean)->Unit) {Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){Text(label,Modifier.weight(1f).padding(top=12.dp));Switch(checked=value,onCheckedChange=onChange)}}
+/** The whole row is the switch: tapping the label toggles it, and screen readers announce one switch with its label. */
+@Composable fun Toggle(label: String,value: Boolean,onChange: (Boolean)->Unit) {Row(Modifier.fillMaxWidth().toggleable(value=value,role=Role.Switch,onValueChange=onChange),horizontalArrangement=Arrangement.SpaceBetween){Text(label,Modifier.weight(1f).padding(top=12.dp));Switch(checked=value,onCheckedChange=null)}}
 fun time(ms: Long)="%02d:%02d".format(ms/60000,(ms/1000)%60)
 
 @Composable fun SessionView(app: ProApp,s: Session,busy: Boolean,recording: Boolean,t: CopyText,act: (suspend ()->Unit)->Unit,engine: Processing,onBack: ()->Unit,onProcess: ()->Unit,onCancel: ()->Unit,onShare: ()->Unit) {
@@ -133,7 +136,7 @@ fun time(ms: Long)="%02d:%02d".format(ms/60000,(ms/1000)%60)
             TextButton(enabled=!busy && !recording,onClick={deletion="session"}){Text(t("delete"))}
             if(s.audioRetained)TextButton(enabled=!busy && !recording,onClick={deletion="audio"}){Text(t("delete_audio"))}
         }
-        if(!s.audioRetained)Text(t("audio_deleted"))
+        if(s.received)Text(t(if(s.sourceBundle?.startsWith("cloud:")==true)"received_cloud"else "received_phone"))else if(!s.audioRetained)Text(t("audio_deleted"))
         if(s.gaps.isNotEmpty())Text(t("gaps")+": "+s.gaps.joinToString {time(it.startMs)+"–"+(it.endMs?.let(::time)?:"?")})
         Row {listOf("summary","transcript","profiles").forEach {name->FilterChip(selected=section==name,onClick={section=name},label={Text(t(name))})}}
         LazyColumn(Modifier.weight(1f),state=listState,verticalArrangement=Arrangement.spacedBy(10.dp)) {
@@ -141,7 +144,7 @@ fun time(ms: Long)="%02d:%02d".format(ms/60000,(ms/1000)%60)
                 item {if(edit)OutlinedTextField(value=draft,onValueChange={draft=it},modifier=Modifier.fillMaxWidth().heightIn(min=250.dp),label={Text(t("summary"))})else Text(s.summaryText().ifBlank {t("empty_summary")})}
                 item {Row(Modifier.horizontalScroll(rememberScrollState())) {
                     if(edit) {TextButton(onClick={act {app.vault.update(s.id){it.edited().copy(editedSummary=draft)}};edit=false}){Text(t("save"))};TextButton(onClick={edit=false;draft=s.summaryText()}){Text(t("cancel"))}}
-                    else if(s.summaryText().isNotBlank()) {TextButton(enabled=!busy && !recording,onClick={edit=true}){Text(t("edit"))};TextButton(enabled=!busy && !recording && !s.approved,onClick={act {app.vault.update(s.id){require(it.revision==s.revision);it.copy(approvedRevision=s.revision)};if(app.vault.preferences().deleteAudioAfterApproval)app.vault.deleteAudio(s.id)}}){Text(t("approve"))};TextButton(onClick=onShare){Text(t("send"))};if(Hybrid.configured)TextButton(onClick={cloudShare=true}){Text(t("cloud_share"))};TextButton(onClick={export=true}){Text(t("external_export"))}}
+                    else if(s.summaryText().isNotBlank()) {TextButton(enabled=!busy && !recording,onClick={edit=true}){Text(t("edit"))};if(!s.received)TextButton(enabled=!busy && !recording && !s.approved,onClick={act {app.vault.update(s.id){require(it.revision==s.revision);it.copy(approvedRevision=s.revision)};if(app.vault.preferences().deleteAudioAfterApproval)app.vault.deleteAudio(s.id)}}){Text(t("approve"))};if(!s.received)TextButton(onClick=onShare){Text(t("send"))};if(!s.received && Hybrid.configured)TextButton(onClick={cloudShare=true}){Text(t("cloud_share"))};TextButton(onClick={export=true}){Text(t("external_export"))}}
                 }}
                 s.summary?.let {summary -> items(summary.paragraphs+summary.decisions+summary.uncertainties+summary.actions.map {Statement(listOfNotNull(it.text,it.owner,it.due).joinToString(" · "),it.sources)}){st ->Column {Text(st.text);st.sources.forEach {source->TextButton(onClick={focus=source;section="transcript"}){Text(t("source")+" · "+(s.transcript.find {it.id==source}?.startMs?.let(::time)?:source.take(8)))}}}}}
             } else if(section=="transcript") {

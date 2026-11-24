@@ -9,7 +9,10 @@ options live in untracked `android/local.properties`, never in Git.
 
 ## 1. Project and plan
 
-1. Create a Firebase project (console, or `npx firebase-tools projects:create <id>`).
+1. Create a Firebase project (console, or `npx firebase-tools projects:create <id>`). Ours is
+   `contextfriend-pro-hybrid`. In Claude Code or another non-interactive shell,
+   `npx firebase-tools login` prints a link instead of opening the browser; open it, then run
+   `npx firebase-tools login <code>` with the code it shows.
 2. **Upgrade to Blaze** and set a budget alert (we use €10). Firebase AI Logic with the
    Vertex AI (Agent Platform) backend always needs Blaze. The free Gemini Developer API tier
    is not an option for this app: the Gemini API terms allow only paid services for apps
@@ -42,9 +45,11 @@ No `google-services.json` and no Google Services Gradle plugin are needed.
 
 ## 4. App Check
 
-- **Debug builds** use the debug provider. Run the app once, find
-  `Enter this debug secret into the allow list` in logcat, and add the token under
-  App Check → Apps → your app → **Manage debug tokens**. Never commit or share it.
+- **Debug builds** use the debug provider. Run the app once and look in logcat for
+  `DebugAppCheckProvider: ... register it with your project`, which prints the token and a ready
+  `firebase appcheck:debugtokens:create <token> --project <id> --app <appId>` command. Register it
+  that way or under App Check → Apps → your app → **Manage debug tokens**. Never commit or share it,
+  and delete it when you are done (`appcheck:debugtokens:delete`).
 - **Release builds** use Play Integrity. Link the Cloud project in Play Console
   (Release → App integrity → Play Integrity API → Link Cloud project) and register the
   signing certificate's SHA-256 in App Check. For APKs installed outside Google Play, set
@@ -54,20 +59,29 @@ No `google-services.json` and no Google Services Gradle plugin are needed.
 ## 5. Authentication
 
 Enable the **Anonymous** sign-in provider. The app signs in anonymously so that Firestore
-rules and per-user AI Logic limits have a user. No personal account exists.
+rules and per-user AI Logic limits have a user. No personal account exists. `firebase.json`
+declares it, so one command does it:
+
+```bash
+npx firebase-tools deploy --only auth --project <id>
+```
 
 ## 6. Firestore (encrypted cloud links only)
 
-Create the default database in **eur3** (Europe multi-region), then deploy the rules:
+`firebase.json` pins the default database to **eur3** (Europe multi-region). Set the location
+before the first deploy: without it the CLI creates the database in `nam5` (US), and a Firestore
+location can never be changed. One deploy enables the API, creates the database and releases the
+rules:
 
 ```bash
 npx firebase-tools deploy --only firestore:rules --project <id>
 ```
 
-Turn on a TTL policy so expired links are deleted automatically:
+The TTL policy that deletes expired links (`shares.expiresAt`) is in
+`firebase/firestore.indexes.json`. Firestore TTL needs billing, so deploy it after the Blaze upgrade:
 
 ```bash
-gcloud firestore fields ttls update expiresAt --collection-group=shares --enable-ttl --project <id>
+npx firebase-tools deploy --only firestore:indexes --project <id>
 ```
 
 ## 7. Remote Config

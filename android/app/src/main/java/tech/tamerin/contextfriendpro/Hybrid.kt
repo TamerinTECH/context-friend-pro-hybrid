@@ -45,6 +45,7 @@ object Hybrid {
     @Volatile private var firebase: FirebaseApp? = null
     @Volatile var config = HybridConfig()
         private set
+    @Volatile private var defaultsReady: Task<Void>? = null
 
     val ready: Boolean get() = firebase != null
     fun firebaseApp(): FirebaseApp? = firebase
@@ -64,8 +65,11 @@ object Hybrid {
         val remote = FirebaseRemoteConfig.getInstance(app)
         remote.setConfigSettingsAsync(FirebaseRemoteConfigSettings.Builder()
             .setMinimumFetchIntervalInSeconds(if (BuildConfig.DEBUG) 0 else 3600).build())
-        remote.setDefaultsAsync(REMOTE_DEFAULTS)
-        config = readConfig(remote) // last activated values work offline
+        // Until Remote Config has loaded, the kill switch stays closed. Reading before the defaults are applied
+        // would return static zeros (cloud off, chunk size 0), so the first read waits for them. Last activated
+        // values survive restarts and work offline.
+        config = HybridConfig(cloudEnabled = false)
+        defaultsReady = remote.setDefaultsAsync(REMOTE_DEFAULTS).addOnCompleteListener { config = readConfig(remote) }
     }
 
     /** Anonymous sign-in: Firestore rules and per-user AI Logic limits need a user. Offline it fails quietly. */
@@ -81,6 +85,7 @@ object Hybrid {
     suspend fun refreshConfig(): HybridConfig {
         val app = firebase ?: return config
         val remote = FirebaseRemoteConfig.getInstance(app)
+        runCatching { defaultsReady?.await() }
         runCatching { remote.fetchAndActivate().await() }
         return readConfig(remote).also { config = it }
     }

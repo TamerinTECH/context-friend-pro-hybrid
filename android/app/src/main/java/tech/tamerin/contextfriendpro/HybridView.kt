@@ -90,6 +90,9 @@ fun regionLabel(t: CopyText) = if (Hybrid.location == "eu") t("region_eu") else 
         title = { Text(t("cloud_panel_title")) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                // Local-only mode (Remote Config kill switch): say so before asking for consent. The policy gate in
+                // CloudDraft.send blocks the request anyway; this only spares the user a pointless review.
+                if (!config.cloudEnabled) { Text(t("reason_cloud_disabled")); return@Column }
                 val d = draft.getOrNull()
                 if (d == null) { Text(t("reason_" + (draft.exceptionOrNull()?.message ?: "cloud_failed"))); return@Column }
                 Text(t("cloud_note").replace("{region}", regionLabel(t)), style = MaterialTheme.typography.bodySmall)
@@ -113,7 +116,7 @@ fun regionLabel(t: CopyText) = if (Hybrid.location == "eu") t("region_eu") else 
             }
         },
         confirmButton = {
-            TextButton(enabled = consent && !sending && draft.isSuccess, onClick = {
+            TextButton(enabled = consent && !sending && draft.isSuccess && config.cloudEnabled, onClick = {
                 sending = true
                 scope.launch { val reason = engine.cloud(draft.getOrThrow(), consent); sending = false; onClose(reason ?: "sent") }
             }) { Text(t("cloud_send")) }

@@ -18,7 +18,7 @@ class ProApp: Application() {
     val signedIn=MutableStateFlow(false)
     override fun onCreate() {
         super.onCreate();vault=Vault(this);models=Models(this)
-        runCatching {Hybrid.init(this)}
+        runCatching {Hybrid.init(this)};hybridConfig.value=Hybrid.config
         scope.launch(Dispatchers.IO) {runCatching {vault.recover()};changed()}
         refreshHybrid()
     }
