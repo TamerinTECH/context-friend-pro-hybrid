@@ -25,6 +25,17 @@ This enables `aiplatform.googleapis.com` and `firebasevertexai.googleapis.com` a
 App Check enforcement for AI Logic. The app uses location `eu` (the EU multi-region: data
 residency and ML processing in EU member states). Change it with `firebase.vertexLocation`.
 
+App Check enforcement for AI Logic starts at once (App Check service `firebaseml.googleapis.com`).
+Until a build's debug token is registered (section 4), every cloud request fails with
+`401 Firebase App Check token is invalid`, and the app says the copy could not be verified. Check the
+state with:
+
+```bash
+curl -s -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+  -H "x-goog-user-project: <id>" \
+  https://firebaseappcheck.googleapis.com/v1beta/projects/<id>/services
+```
+
 ## 3. Android app
 
 Register an Android app with package `com.tamerintech.contextfriendpro`, then copy its options

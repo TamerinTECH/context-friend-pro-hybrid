@@ -189,7 +189,8 @@ class Processing(private val app: ProApp) {
             Audit.add(app.vault,AuditEntry(action="policy_violation",engine=model.engine.id,reason=e.message,meeting=ref));"policy_violation"
         } catch(e: Exception) {
             Audit.add(app.vault,AuditEntry(action="cloud_failed",engine=model.engine.id,model=label,reason=e.message?.take(80) ?: e.javaClass.simpleName,consent=consent,meeting=ref))
-            "cloud_failed"
+            // AI Logic enforces App Check: an unverified app copy gets its own message instead of a generic failure.
+            if(e.message?.contains("App Check",ignoreCase=true)==true)"cloud_unverified" else "cloud_failed"
         }
     }
 }

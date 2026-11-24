@@ -14,6 +14,9 @@ Hackathon work for #BuildHybridAI 2026. The first commit is disclosed pre-existi
   switch stays closed until then; received meetings say where they came from and cannot be
   approved or re-shared; tapping a switch's label toggles it; the privacy panel says at once when
   the cloud is switched off.
+- Blaze and AI Logic on; Firestore TTL for expired links deployed. AI Logic enforces App Check, and
+  a cloud request refused by App Check now says that this copy of the app could not be verified
+  instead of a generic failure (English, German, Hebrew).
 
 ## 2026-11-22
 

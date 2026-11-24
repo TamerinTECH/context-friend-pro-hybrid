@@ -368,3 +368,24 @@ Defects found and fixed in this run:
 Open: link creation took about 10 s because the unregistered App Check debug token was rejected
 first (App Check is not enforced yet). The Firestore TTL policy for `shares.expiresAt` needs the
 Blaze plan; it is defined in `firebase/firestore.indexes.json` and deploys after the upgrade.
+
+### Blaze and AI Logic — 24 November 2026, evening
+
+Read back with gcloud: billing enabled; `aiplatform.googleapis.com` and
+`firebasevertexai.googleapis.com` enabled; App Check enforcement **ENFORCED** for
+`firebaseml.googleapis.com` (Firebase AI Logic), not enforced for Firestore.
+
+| Check | Result | Where |
+|---|---|---|
+| Firestore TTL for `shares.expiresAt` | Deployed with `deploy --only firestore:indexes`; state `CREATING` right after (Firestore can take up to a day to activate a TTL policy) | Live project |
+| Cloud notes, consented Send of a test meeting (blank audio, no names) | **Refused by App Check**: `401 UNAUTHENTICATED Firebase App Check token is invalid`; notes unchanged; privacy log `cloud_failed · gemini-4-hydrogen · eu · Firebase App Check token is invalid` | Emulator, unregistered debug token |
+| Location `eu` on the AI Logic endpoint | Routed to the service (the 401 comes from App Check), while a made-up location returns 404 at the front end. The model name can only be confirmed once App Check passes | Same request, plus a direct REST call that copies the SDK's |
+| JVM unit tests | 75/75 PASS | Host |
+
+Fixed in this run: a cloud request refused by App Check showed the generic "The cloud request
+failed". It now says that this copy of the app could not be verified (Firebase App Check), in
+English, German and Hebrew. Judges on a phone that fails Play Integrity would otherwise get no
+clue.
+
+Next: register the emulator's debug token, then repeat the cloud notes run (placeholders out,
+names back, badge `IN_CLOUD`).
