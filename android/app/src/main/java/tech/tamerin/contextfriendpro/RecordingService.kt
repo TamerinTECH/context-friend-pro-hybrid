@@ -45,7 +45,7 @@ class RecordingService: Service() {
         manager.createNotificationChannel(NotificationChannel("recording",getString(R.string.recording),NotificationManager.IMPORTANCE_LOW))
         val stop=PendingIntent.getService(this,1,Intent(this,RecordingService::class.java).setAction("stop"),PendingIntent.FLAG_IMMUTABLE)
         val open=PendingIntent.getActivity(this,0,Intent(this,MainActivity::class.java),PendingIntent.FLAG_IMMUTABLE)
-        val n=Notification.Builder(this,"recording").setSmallIcon(android.R.drawable.ic_btn_speak_now).setContentTitle(getString(R.string.app_name))
+        val n=Notification.Builder(this,"recording").setSmallIcon(R.drawable.ic_stat_contextfriend).setContentTitle(getString(R.string.app_name))
             .setContentText(getString(if(paused.get()) R.string.paused else R.string.recording)).setContentIntent(open)
             .setOngoing(true).setVisibility(Notification.VISIBILITY_SECRET).addAction(Notification.Action.Builder(null,getString(R.string.stop),stop).build()).build()
         startForeground(7,n,ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE)
