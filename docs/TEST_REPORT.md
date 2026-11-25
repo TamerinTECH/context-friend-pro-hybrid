@@ -389,3 +389,19 @@ clue.
 
 Next: register the emulator's debug token, then repeat the cloud notes run (placeholders out,
 names back, badge `IN_CLOUD`).
+
+### Screenshot tour — 25 November 2026
+
+Every screen captured on the emulator in English, German and Hebrew for a look and feel review
+(kept outside the repository). The tour found one crash:
+
+- **QR scanner crashed the app** (`ArrayIndexOutOfBoundsException` in `CameraQr.kt`) when it was
+  closed. The scanner closed its frame reader from the UI thread while the camera thread was
+  copying a frame with strides it never checked. Fixed: the frame copy is a bounds-checked
+  function (`lumaPlane`, 3 new unit tests) that skips bad frames, and the reader closes on the
+  camera thread. Re-tested: scanner open for 8 s, then Cancel; the app stays open, crash log empty.
+  Decoding a real QR code is still to be checked between the Pixel and the emulator.
+- JVM unit tests: 78/78 PASS.
+
+The emulator had stalled earlier because drive D: was full; after space was freed it was
+cold-booted with the same options.

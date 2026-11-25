@@ -18,6 +18,15 @@ fun qrBitmap(text: String): Bitmap {
     val matrix=QRCodeWriter().encode(text,BarcodeFormat.QR_CODE,640,640,mapOf(EncodeHintType.MARGIN to 3,EncodeHintType.ERROR_CORRECTION to com.google.zxing.qrcode.decoder.ErrorCorrectionLevel.M))
     return Bitmap.createBitmap(640,640,Bitmap.Config.ARGB_8888).apply {for(y in 0 until 640)for(x in 0 until 640)setPixel(x,y,if(matrix[x,y])Color.BLACK else Color.WHITE)}
 }
+/** Copies the luminance plane of a camera frame into a tight width×height array, or null when the
+ *  reported strides do not fit the buffer. Such a frame is skipped instead of crashing the app. */
+fun lumaPlane(raw: ByteArray,width: Int,height: Int,rowStride: Int,pixelStride: Int): ByteArray? {
+    if(width<=0 || height<=0 || pixelStride<=0 || rowStride<=0) return null
+    if((height-1).toLong()*rowStride+(width-1).toLong()*pixelStride>=raw.size) return null
+    val pixels=ByteArray(width*height)
+    for(y in 0 until height) {val row=y*rowStride;for(x in 0 until width)pixels[y*width+x]=raw[row+x*pixelStride]}
+    return pixels
+}
 @SuppressLint("MissingPermission")
 @Composable fun QrCamera(modifier: Modifier,onResult: (String)->Unit) {
     val result by rememberUpdatedState(onResult)
@@ -25,7 +34,8 @@ fun qrBitmap(text: String): Bitmap {
     var session by remember {mutableStateOf<CameraCaptureSession?>(null)}
     var reader by remember {mutableStateOf<ImageReader?>(null)}
     val thread=remember {HandlerThread("qr-camera").apply {start()}}
-    DisposableEffect(Unit) {onDispose {session?.close();camera?.close();reader?.close();thread.quitSafely()} }
+    // The reader is closed on the camera thread, so a frame that is being decoded is never freed under it.
+    DisposableEffect(Unit) {onDispose {session?.close();camera?.close();val r=reader;Handler(thread.looper).post {r?.setOnImageAvailableListener(null,null);r?.close()};thread.quitSafely()} }
     AndroidView(modifier=modifier,factory={context -> TextureView(context).apply {
         surfaceTextureListener=object: TextureView.SurfaceTextureListener {
             override fun onSurfaceTextureAvailable(texture: SurfaceTexture,width: Int,height: Int) {
@@ -38,14 +48,16 @@ fun qrBitmap(text: String): Bitmap {
                 output.setOnImageAvailableListener({r ->
                     val frame=r.acquireLatestImage() ?: return@setOnImageAvailableListener
                     try {
-                        val plane=frame.planes[0];val raw=ByteArray(plane.buffer.remaining());plane.buffer.get(raw)
-                        val pixels=ByteArray(frame.width*frame.height)
-                        for(y in 0 until frame.height)for(x in 0 until frame.width)pixels[y*frame.width+x]=raw[y*plane.rowStride+x*plane.pixelStride]
-                        val source=PlanarYUVLuminanceSource(pixels,frame.width,frame.height,0,0,frame.width,frame.height,false)
+                        val plane=frame.planes[0];val width=frame.width;val height=frame.height
+                        val raw=ByteArray(plane.buffer.remaining());plane.buffer.get(raw)
+                        val pixels=lumaPlane(raw,width,height,plane.rowStride,plane.pixelStride) ?: return@setOnImageAvailableListener
+                        val source=PlanarYUVLuminanceSource(pixels,width,height,0,0,width,height,false)
                         val decoded=runCatching {MultiFormatReader().decode(BinaryBitmap(HybridBinarizer(source)),mapOf(DecodeHintType.POSSIBLE_FORMATS to listOf(BarcodeFormat.QR_CODE),DecodeHintType.TRY_HARDER to true)).text}.getOrNull()
                         if(decoded!=null && decoded.length<=2048 && (decoded!=last || SystemClock.elapsedRealtime()-lastAt>2000)) {
                             last=decoded;lastAt=SystemClock.elapsedRealtime();Handler(Looper.getMainLooper()).post {result(decoded)}
                         }
+                    } catch(_: IllegalStateException) {
+                        // The camera closed while this frame was read: skip it.
                     } finally {frame.close()}
                 },handler)
                 manager.openCamera(id,object: CameraDevice.StateCallback() {

@@ -3,6 +3,11 @@
 Hackathon work for #BuildHybridAI 2026. The first commit is disclosed pre-existing code
 (docs/PRE_EXISTING.md); everything listed here was built during the submission period.
 
+## 2026-11-25
+
+- QR scanner no longer crashes the app when it closes: the camera frame copy checks its bounds and
+  skips bad frames, and the frame reader closes on the camera thread (3 new unit tests, 78 in total).
+
 ## 2026-11-24
 
 - Firebase project `contextfriend-pro-hybrid` connected: Firestore pinned to eur3 in
