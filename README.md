@@ -1,3 +1,5 @@
+<img src="docs/brand/contextfriend-logo.svg" width="96" alt="ContextFriend logo">
+
 # ContextFriend Pro Hybrid
 
 **Meeting notes for teachers, where the conversation never has to leave the phone.**
@@ -9,12 +11,23 @@ all on the phone. The notes come from **Gemini Nano through Firebase AI Logic** 
 the teacher asks for it: names are replaced on the phone first, the teacher sees the exact text that
 would be sent, and the answer is put back together on the phone.
 
-> **#BuildHybridAI 2026 entry, work in progress (22 Nov 2026).** The native recorder in the first
+> **#BuildHybridAI 2026 entry, work in progress (25 Nov 2026).** The native recorder in the first
 > commit is disclosed pre-existing work ([docs/PRE_EXISTING.md](docs/PRE_EXISTING.md)); everything
 > after it was built during the submission period ([CHANGELOG.md](CHANGELOG.md)). Gemini Nano, cloud
 > and link features are implemented and unit-tested; the phone checks are tracked in
 > [docs/SUBMISSION_CHECKLIST.md](docs/SUBMISSION_CHECKLIST.md) and reported in
 > [docs/TEST_REPORT.md](docs/TEST_REPORT.md).
+
+## Screens
+
+Emulator, debug build, synthetic example meeting (25 Nov 2026). Status: [docs/DONE.md](docs/DONE.md),
+[docs/PENDING.md](docs/PENDING.md).
+
+| Meetings | Recording | Creating notes |
+|---|---|---|
+| <img src="docs/screenshots/1-meetings.png" width="220" alt="Meetings list"> | <img src="docs/screenshots/2-recording.png" width="220" alt="Recording"> | <img src="docs/screenshots/3-creating-notes.png" width="220" alt="Creating notes"> |
+| **Summary** | **Review what you send** | **No speech** |
+| <img src="docs/screenshots/4-summary.png" width="220" alt="Summary with sources"> | <img src="docs/screenshots/5-review-what-you-send.png" width="220" alt="Cloud review with replaced names"> | <img src="docs/screenshots/6-no-speech.png" width="220" alt="No speech detected"> |
 
 ## Why hybrid here means a privacy boundary
 

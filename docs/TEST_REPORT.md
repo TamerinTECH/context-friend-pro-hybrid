@@ -405,3 +405,35 @@ Every screen captured on the emulator in English, German and Hebrew for a look a
 
 The emulator had stalled earlier because drive D: was full; after space was freed it was
 cold-booted with the same options.
+
+### Redesign checked on the emulator — 25 November 2026
+
+Debug build with the redesign, same emulator (no microphone: `-no-audio`), live Firebase project. The
+summary and review screens were checked with the debug-only synthetic example meeting.
+
+| Check | Result |
+|---|---|
+| App icon, splash, status bar | PASS: new adaptive and round icon on the launcher and splash; dark status icons on light screens, light on the recording screen |
+| Meetings, states | PASS: legacy blank meetings show "No speech" (no fake summary); date-only titles without a topic; the example shows "Draft for review" |
+| Recording | PASS: setup (title, summary style, language, checkbox), full-screen recording, pause and resume, banner on Meetings while recording; level bars stay flat on silence and say "No sound yet" |
+| Automatic notes | PASS: "Finish recording" started processing by itself with real steps; the silent recording ended as "No speech". Speech to text on the emulator CPU took several minutes for 68 s of silence |
+| Summary, sources, transcript, speakers, menu, rename, summary style | PASS |
+| Mark as reviewed → Share summary → Encrypted link → Create link → QR, Copy link | PASS |
+| Receive → paste the link → open | PASS after fix (it bounced back to Receive) |
+| Review what you send: text first, `[PERSON_n]` highlighted, tap-to-replace "Noah", exact request | PASS |
+| Send once to Gemini | Refused by App Check as expected (debug token not registered); plain message shown |
+| Edit summary, unsaved-changes dialog on system back | PASS after fix (back left without asking) |
+| Delete conversation | PASS |
+| Settings pages: On-device AI, Get ready for offline notes, Privacy activity with details, storage, cloud, language, models, voice | PASS; option rows tappable after fix |
+| Hebrew | PASS after fix: mirrored layout and icons, Hebrew dates and 24 h time, technical values isolated, English content in its own direction |
+| German | PASS: long labels wrap, German dates |
+| JVM unit tests | 90/90 PASS |
+
+Fixed in this run: a just-received link bounced back to Receive (the meeting was not yet in the list);
+received notes said "Edited on this phone"; system back left the editor without asking (the Compose
+compiler cached a function reference with an old `changed` value); radio option labels were not
+tappable; the privacy activity said "Nothing sent" for requests that may have reached the server;
+English content was mirrored in the Hebrew UI.
+
+Not checked here (needs the Pixel): Gemini Nano, real speech, cloud notes, QR scanning of a real code,
+phone-to-phone transfer.

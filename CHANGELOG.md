@@ -6,7 +6,26 @@ Hackathon work for #BuildHybridAI 2026. The first commit is disclosed pre-existi
 ## 2026-11-25
 
 - QR scanner no longer crashes the app when it closes: the camera frame copy checks its bounds and
-  skips bad frames, and the frame reader closes on the camera thread (3 new unit tests, 78 in total).
+  skips bad frames, and the frame reader closes on the camera thread (3 new unit tests).
+- **Redesign** after a design review (docs/design/): three bottom tabs (Meetings, Receive, Settings);
+  a recording setup screen and a full-screen recording view with real level bars; notes start by
+  themselves after recording, with the real steps; distinct states (no speech, not created, needs
+  attention, draft, reviewed, received); one main action per state with the rest in a menu;
+  provenance per meeting instead of a global label; earlier notes kept and restorable after a cloud
+  run; one "Share summary" entry; a full-page "Review what you send"; a Receive tab; Settings grouped
+  with On-device AI, Get ready for offline notes and a readable privacy activity; the "Quiet Blue"
+  colour scheme on every component, readable status bar, localized dates, Hebrew bidi isolation,
+  content text direction. Meeting state logic in `MeetingState.kt` with 12 unit tests (90 in total).
+- New and changed copy in English, German and Hebrew (429 strings per language).
+- **Logo**: vector redraw and every asset generated from one script (docs/brand/): adaptive, round,
+  themed and notification icons, in-app logo, PNGs, Play icon and feature graphic, Devpost thumbnail.
+- Debug builds only: Settings → Advanced → "Add an example meeting" (synthetic text, no audio) to check
+  the summary and review screens on an emulator without a microphone.
+- Fixed while checking on the emulator: a just-received link bounced back to Receive; received notes
+  said "Edited on this phone"; system back left the editor without asking (a cached function reference
+  kept an old value); option labels were not tappable; "Nothing sent" was shown for requests that may
+  have reached the server; English content was mirrored in the Hebrew UI.
+- Judge guide, video script and other docs updated to the new screens; docs/DONE.md and docs/PENDING.md.
 
 ## 2026-11-24
 

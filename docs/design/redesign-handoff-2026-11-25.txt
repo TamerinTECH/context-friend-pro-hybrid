@@ -1,0 +1,735 @@
+CONTEXTFRIEND MOBILE
+UX AND NATIVE UI IMPLEMENTATION HANDOFF
+25 November 2026
+
+Status: proposed redesign, based on eight supplied screenshot boards.
+Audience: the product owner and the coding agent implementing the native app.
+
+This document does not certify implementation, security, model compatibility,
+data residency, encryption, or production readiness. The repository was not
+inspected. Preserve working capabilities while replacing the navigation,
+presentation, action hierarchy, and user-facing language. All example meeting
+titles, summaries, people, durations, dates, and event histories in the mocks
+are fictional demonstration content.
+
+1. PRODUCT DIRECTION
+
+Make the ordinary journey obvious:
+Start recording, finish, wait for notes, review, share when needed.
+
+A first-time user should not need to understand models, inference engines,
+token hashes, transport protocols, Firebase, or biometric embeddings to obtain
+a useful summary. Those concepts remain available where they support a real
+choice or help diagnose a problem.
+
+The interface should feel calm, competent, personal, and modern. Its visual
+identity comes from clear typography, blue surfaces, useful whitespace, a
+small warm yellow accent, and a restrained paired-arc motif suggesting
+listening or smiling eyes. Do not turn the app into a cartoon assistant or a
+dashboard full of decorative statistics.
+
+The screenshots show a mobile app with optional cloud operations and saved
+audio controls. That is not automatically the same operational policy as the
+school deployment, whose target is school-controlled processing and no
+persistent raw audio. Treat these as explicit product modes or deployments.
+Never merge their promises into one unconditional privacy statement.
+
+2. RECOMMENDED INFORMATION ARCHITECTURE
+
+Use three fixed, visible bottom-navigation destinations:
+
+- Meetings: the user's meeting list, search when justified by the number of
+  items, and a prominent New recording action.
+- Receive: scan a shared code, paste a link, or receive directly from another
+  phone. The screen explains each option in ordinary language.
+- Settings: local AI readiness, privacy and storage, language, app protection,
+  and advanced tools.
+
+Use a local top app bar for the meeting detail, editor, cloud preview,
+recording, and receive flow. Show a back action and a clear screen title.
+Do not repeat the full product name, global tabs, and global processing claim
+on every child screen. During an active recording, prioritize recording
+controls rather than encouraging accidental navigation.
+
+Remove the horizontally scrolling global tab row. Moving hidden controls
+into another horizontally scrolling row is not an acceptable fix.
+
+Inside a meeting, show two content tabs only: Summary and Transcript.
+Speaker labels belong inside Transcript. Cross-meeting voice recognition
+belongs under Settings > Advanced > Voice recognition, with separate consent
+and a clear experimental status if that is the actual implementation state.
+
+Summary format is chosen during recording setup or changed from meeting
+options. Do not permanently show all formats above every summary.
+
+3. PRIMARY ACTION RULES
+
+Each screen has one clear primary action. Secondary actions must remain
+discoverable without competing with it.
+
+- Meetings: New recording.
+- Recording setup: Start recording.
+- Recording: Finish recording. Pause remains a separate secondary action.
+- Preparing notes: a readable stage and any safe supported cancel action.
+- Draft summary: Mark as reviewed.
+- Reviewed summary: Share summary.
+- Summary editor: Save changes.
+- Share preview: Continue to the selected sharing method.
+- Cloud preview: Send once to Gemini, or the verified provider's real name.
+- Received notes: Save to meetings, after an explicit preview.
+- Model setup: Prepare this phone, followed by the actual download action.
+- Recoverable failure: Retry on this phone.
+
+Contextual options can include Rename, Change summary format, Regenerate
+notes, Audio and storage, and Delete meeting. Destructive actions belong in
+an overflow menu or storage screen, separated from primary actions. Never
+render a fixed-width horizontal row of these actions.
+
+Use ordinary buttons for one-time decisions. A toggle is for a persistent
+preference. Replace switches labelled as one-time cloud consent or link
+creation with a readable preview and a clearly labelled action. Recording
+acknowledgement, where required by the product's agreed policy, can use an
+explicit checkbox rather than masquerading as an app preference.
+
+4. VISUAL SYSTEM
+
+Proposed light palette:
+
+- App background: #F7F8FA.
+- Content surface: #FFFFFF.
+- Primary text and navy: #162E51.
+- Primary action blue: #245FD6.
+- Soft blue: #EAF1FF.
+- Warm highlight: #F6C453, with navy text.
+- Positive state: #177353.
+- Positive background: #E8F4EF.
+- Secondary text: choose a verified accessible neutral against each surface.
+- Error text and backgrounds: define semantic tokens and verify contrast.
+
+These are proposed design tokens, not a claim that all color pairs already
+meet every contrast requirement. Check final rendered combinations.
+
+Use a complete app color scheme. Buttons, selected tabs, chips, dialogs,
+switches, progress, system bars, and pressed states must derive from the same
+scheme. Remove unintentional default lavender surfaces. If the app supports
+Android dynamic color, make the behavior a deliberate product choice rather
+than allowing it to partially overwrite the brand.
+
+Use native typography. For Android, a well-configured system font is a strong
+default. Use 16sp body text, 14sp secondary text, clear 20-24sp section titles,
+and a larger 28-32sp title only where it serves the hierarchy. Do not reduce
+important privacy, consent, or error text to fit a fixed panel. Support system
+font scaling and multiline labels.
+
+Use an 8dp spacing rhythm, with 4dp adjustments when needed. Typical page
+padding is 20-24dp, card padding 16-20dp, and content-card corner radius
+18-24dp. Maintain at least 48dp effective touch targets for Android controls.
+Screen and sheet heights adapt to content and device insets.
+
+Use yellow sparingly for one friendly brand detail or emphasis. Avoid white
+text on yellow. Do not encode a state with color alone. Pair the color with
+a readable state label and, where helpful, an icon.
+
+Use a coherent native icon set. Each icon-only action needs an accessible
+label. The proposed paired arcs are a brand concept, not a replacement for
+an approved existing logo. Keep them static outside intentional transitions.
+Respect reduced-motion settings. A waveform may represent actual signal
+level while recording; do not animate fictional speech activity.
+
+5. SCREEN SPECIFICATIONS
+
+5.1 Meetings
+
+Show a compact brand header and a clear page heading. Provide a strong New
+recording button, above the list or in a native extended floating action
+button that does not obscure content. Keep it inside safe insets.
+
+Use meeting cards with:
+- A meaningful, editable title.
+- A localized date, start time, and duration when known.
+- A short relevant preview, when useful.
+- A readable state: Draft, Reviewed, Preparing notes, Needs attention, or
+  Received.
+
+Avoid duplicate generic Meeting Notes labels. Generate a conservative title
+from actual supported content when available. Otherwise use a localized
+fallback such as Meeting on 25 November, 10:30. Do not fabricate a topic.
+Preserve a user-edited title on regeneration.
+
+An empty state has one short explanation and the same New recording action.
+Optional example content must be explicitly labelled Example and kept out
+of real meeting results. A model-readiness banner appears only when action
+is needed, not as permanent technical chrome.
+
+5.2 Prepare this phone
+
+When local processing is not ready, explain the benefit: Download the files
+needed to create notes on this phone. Show verified total download size,
+available storage, and the chosen compatible package. Values come from the
+actual package manifest and runtime checks, never illustrative hardcoding.
+
+Offer a recommended compatible configuration. Keep individual model names,
+licenses, hashes, import options, and engine selection under Advanced.
+Receiving and reading notes should remain available without model setup if
+that is supported. Do not force account creation solely to reveal local
+features unless the actual product architecture requires it.
+
+Treat download, verification, installed readiness, unsupported device, low
+storage, network interruption, and corrupt file as distinct states. Offer
+retry, safe cleanup, or another verified local option as appropriate. Never
+silently switch to cloud to complete setup or processing.
+
+5.3 Recording setup
+
+Use a focused sheet or full screen. Include an optional title, a compact
+summary-format selector with General as the default, and the essential
+recording notice. A format picker can group Meeting, Lesson, and other
+supported formats with a short description. Keep medical and legal labels
+only if they represent actual available templates; do not imply expertise.
+
+Explain the active data policy in simple, mode-specific language. Examples
+must match implementation: Audio stays on this phone until you delete it,
+or Audio is processed temporarily and not saved. These are mutually
+different policies. Select the truthful one, not the more attractive one.
+
+Request microphone permission at the moment it is needed. If denied, explain
+what is unavailable and offer a route to system settings where appropriate.
+Do not request camera, Bluetooth, local network, or notifications here unless
+the selected operation actually requires them.
+
+5.4 Recording
+
+Show the recording state prominently, an elapsed timer, and an actual input
+level or waveform. Include Pause/Resume and Finish recording. A concise
+active-policy label can say On this phone when that is true for this session.
+
+Show practical states such as Microphone unavailable, Paused, or No sound
+detected only when supported by measured signals. Do not infer participant
+identity or consent from audio. Avoid repeatedly showing legal paragraphs
+over the live recording.
+
+Handle app backgrounding, screen lock, interruption, audio route changes,
+permissions, low storage, and process death through the existing native
+recording architecture. Never display a successful saved-recording message
+until durable persistence is confirmed in a mode that permits persistence.
+In an ephemeral-audio mode, explain what recovery is actually possible.
+
+5.5 Preparing notes
+
+Start the supported local pipeline automatically after the recording ends,
+unless the current product requires a clear reason to ask first. Do not
+require a nontechnical user to discover Process locally as a hidden step.
+
+Show real stages such as Transcribing on this phone and Creating your notes.
+Use a determinate progress bar only if the pipeline supplies meaningful
+progress. Otherwise show an indeterminate indicator and current stage.
+Do not fabricate time estimates, percentages, or successful completion.
+
+Allow the user to return to Meetings while processing when the implementation
+can safely continue. Preserve task state. Announce completion accessibly
+without interrupting other work.
+
+5.6 Draft summary
+
+Prioritize the content. Show title, time, duration, and a small provenance
+label derived from this result. Display Draft until the user explicitly
+reviews it. Use sensible sections such as Overview, Key points, Decisions,
+and Next steps only when supported by source content. Empty sections can be
+omitted instead of generating filler.
+
+Use concise source references that open the relevant transcript passage.
+If retained audio exists and playback is supported, offer Play this moment
+from the passage. Deleting audio must not remove the text reference or leave
+a dead playback button. Do not label a transcript-only reference as audio.
+
+Put Edit and Mark as reviewed near the content in an accessible action area.
+Make the uncertainty message readable and practical: Check names, decisions,
+and action items before sharing. This does not replace necessary domain
+disclosures, but it is more useful than tiny generic warning text.
+
+Approval belongs to a specific content version. Any material edit or
+regeneration resets review status. Keep the previous reviewed version until
+the user intentionally replaces it if versioning already exists. Do not
+silently overwrite a reviewed summary with a cloud result.
+
+5.7 Reviewed summary
+
+Show Reviewed, with reviewer information only if available and appropriate.
+The main action becomes Share summary. Keep Edit available. Reviewed means
+the user completed the product's review step, not that the app guarantees
+factual correctness, legal validity, or institutional approval.
+
+5.8 Transcript and speakers
+
+Show readable speech segments with timestamp, speaker label, text, and
+contextual edit/play actions. Unknown speaker is a valid state. Avoid showing
+raw placeholders such as [BLANK_AUDIO] as a transcript or a summary.
+
+Renaming Speaker 1 to a name within one meeting is ordinary annotation.
+Saving a voice profile for recognition across meetings is a different,
+sensitive operation and requires its own explicit flow. Do not enroll a
+voice profile when the user only edits a speaker label.
+
+Speaker suggestions must be represented as uncertain suggestions unless the
+actual system has appropriate verified identity assurance. Never present
+voice matching as authentication.
+
+5.9 Edit summary
+
+Use a focused editor with a clear title, a readable text field, Save changes,
+and Cancel. Keep source material accessible where feasible. Use keyboard
+insets so Save remains reachable. Handle unsaved changes deliberately.
+
+Explain that editing a reviewed summary returns it to Draft. Do not force
+another consent prompt for a purely local text edit.
+
+5.10 Share summary
+
+Open one understandable entry point. Preview the selected summary version
+and its Draft or Reviewed state before selecting transport. Default to
+summary only. Offer three understandable methods when implemented:
+
+- Protected link: send a link that the recipient opens using the supported
+  app or viewer. Use Encrypted link only when the real implementation
+  supports that specific claim.
+- Nearby phone: transfer directly using an available, implemented transport.
+- Export: send readable text or a supported file to another app.
+
+Keep technical transport selection under an expandable alternative section
+or a specific nearby flow. Availability should reflect actual support.
+Do not show Bluetooth, local-network, or offline QR success paths if they
+are not implemented and validated.
+
+Preserve the ability to share a draft when the current app supports it.
+Present an explicit Share as draft option and carry the draft label into
+the outgoing content. Do not silently mark it Reviewed or invent a universal
+approval gate that blocks an existing workflow.
+
+Transcript and audio are off by default and available only where supported,
+present, and permitted. Show exactly what will be included. A deleted audio
+file cannot remain a selectable attachment. Voice-profile transfer is a
+separate, explicitly consented operation, never bundled into normal sharing.
+
+For readable export, use plain language: The app you choose will receive a
+readable copy. It may save or upload it. Do not make people interpret the
+word plaintext. The native system share sheet can complete the handoff.
+
+5.11 Link created and QR
+
+Show a clear successful creation state only after confirmed creation.
+Display a large QR code, Share link, and Copy link. The QR represents the
+actual generated payload, not a decorative placeholder in production.
+
+Explain access and expiration according to verified behavior. If anyone
+with the link can read the notes, say so. If a server enforces an expiry,
+show its actual time. If revocation is supported, expose it. Do not imply
+that revocation deletes copies already downloaded by someone else.
+
+Distinguish a QR code containing a link from a QR transfer containing the
+notes themselves. A link may still require internet. Offline QR data may
+require multiple frames and a different receiver. These should not share
+one ambiguous Scan to receive offline promise.
+
+5.12 Receive
+
+Show Scan code as the main action, with Paste link and an implemented Nearby
+option as alternatives. Explain the expected source without exposing CFS1
+or QR frame syntax as the primary label. Technical strings may remain in
+advanced diagnostics or pasted input.
+
+Use a proper scanner screen with camera permission requested just in time,
+a clear scan region, accessible torch control if supported, and Cancel.
+Handle unsupported QR, malformed link, expired link, incomplete multi-frame
+transfer, offline state, decryption failure, and an already-imported item.
+
+Preview received notes before saving them. Show Received, the source method,
+and the sender only to the level actually verified. Unverified sender must
+not acquire a verified checkmark. Received summary-only content should not
+show empty Transcript or Audio actions. Show the original review state as
+metadata, not as a new review performed by this device's user.
+
+5.13 Optional cloud improvement
+
+Cloud processing is a deliberate exception, accessible from meeting options
+or an appropriately placed secondary Improve summary action. Do not put it
+beside every normal step as an equally necessary action. Do not hide a
+useful cloud feature, but make its boundary unmistakable.
+
+Use a full-page preview rather than a large nested dialog. Put the meeting
+text that will be sent first. Highlight detected replacements. A count of
+detected replacements does not prove that all personal information has been
+removed. Provide a way to edit or remove the outgoing text and review it
+again before sending.
+
+Always show the provider, the data categories to be sent, and whether audio
+is included. Display processing region only if the actual endpoint and
+service contract justify that claim. Do not equate replaced names with
+anonymization or imply that identifiers are always detected.
+
+Keep Exact request details expandable. It should disclose all actual model
+input, including instructions and attachments, when the product promises
+an exact preview. Collapsing the instructions must not conceal additional
+personal content. Logging and service metadata have separate disclosures;
+do not promise that model-input preview enumerates all network metadata.
+
+Use a clear Send once to Gemini action for that specific reviewed payload,
+or the actual configured provider's name. It is not a persistent opt-in
+switch. Local-only preference must prevent automatic cloud fallback,
+including SDK fallback behaviors. If the payload changes after review,
+require review of the changed payload before sending.
+
+Sending, cancel requested, completed, blocked before sending, and request
+outcome unknown are distinct states. A canceled request may already have
+reached the server. Do not claim Nothing was sent without evidence.
+
+After success, label the new result Cloud-assisted or a more precise truthful
+equivalent. Keep original local notes available until replacement is chosen.
+For App Check failures, show an understandable message and a recovery path.
+Put Firebase App Check and raw identifiers behind Details. Do not weaken or
+disable verification merely to make the demo succeed.
+
+5.14 Settings and privacy activity
+
+Group Settings into readable rows:
+- This phone: local AI readiness, storage, and language.
+- Privacy: active data policy, app lock, screenshot protection, and activity.
+- Optional features: cloud processing and voice recognition.
+- Advanced: model files, engine preference, protected-name list, diagnostics,
+  import/export logs, and other technical controls.
+
+Show processing location per operation or result. A global Local by default
+label can describe the configured preference, but cannot certify the origin
+of every displayed summary, downloaded item, or request.
+
+Privacy activity uses human-readable events and localized times. Example:
+Summary created on this phone. A Details expander can show model ID, error
+code, request identifier, and region where known. Keep technical fields in
+isolated left-to-right spans in Hebrew. Do not store meeting content in
+diagnostic logs merely to support the redesigned activity screen.
+
+Rename Delete audio after approval according to actual semantics, for
+example Delete saved audio after I review the summary. State the impact:
+you can still read the transcript, but replay is unavailable. Do not use
+this option to imply that audio was never stored.
+
+The loss-of-device message should be specific: if there is no backup, say
+so and provide the existing export/backup route. Do not invent an encrypted
+backup feature. Screenshot protection needs a clear explanation, with any
+demo-mode exception explicit and reversible.
+
+6. CAPABILITY AND STATE CONTRACT
+
+Do not infer availability from the screen name. Render actions from actual
+capabilities and data state. These conceptual fields are a design contract,
+not a request for a large architecture rewrite:
+
+- Audio: ephemeral, saved, deleted, unavailable, or not included.
+- Transcript: absent, in progress, ready, no speech, or failed.
+- Summary: absent, in progress, draft, reviewed, or failed.
+- Provenance: local, cloud-assisted, received, mixed, or unknown.
+- Sharing: supported methods, current payload, draft/review status, and
+  whether source audio/transcript are eligible.
+- Local AI: not prepared, downloading, verifying, ready, unsupported,
+  insufficient storage, or failed.
+- Cloud request: not authorized, previewed, sending, success, known failure,
+  blocked before send, cancel requested, or outcome unknown.
+
+Specific interaction rules:
+
+- No speech: show No speech detected and explain the next step. Do not
+  create a reviewable [BLANK_AUDIO] summary. No approve/share-summary action
+  appears for nonexistent content. Retry transcription is useful only if
+  relevant input is still available and the failure is plausibly recoverable.
+- Processing failed with saved audio: explain that the recording is safe
+  only after verifying that it is actually saved. Offer retry and playback
+  where supported.
+- Processing failed without recoverable audio: state the limitation clearly.
+  Do not offer a retry that cannot work.
+- Summary-only received item: allow reading, local editing if supported,
+  export, and deletion. Hide unavailable transcript, speaker, and audio
+  functionality instead of showing empty panels.
+- Audio deleted: keep transcript references; remove playback and audio export.
+- Reviewed content edited: return to Draft; preserve version provenance.
+- Missing model: explain preparation; never silently call cloud.
+- Cloud failure: retain local notes; show actionable recovery, no technical
+  paragraph as the primary message.
+- Network unavailable: local capabilities continue when ready. A cloud link
+  path cannot promise offline success.
+
+7. LANGUAGE AND COPY CHANGES
+
+Replace implementation-led wording with action-led wording:
+
+Current: Process locally.
+Preferred: Create notes on this phone, or Retry on this phone after failure.
+
+Current: Models.
+Preferred: Prepare this phone in ordinary setup; AI models under Advanced.
+
+Current: Exact content preview.
+Preferred: Review what you are sharing.
+
+Current: Prepare encrypted transfer.
+Preferred: Continue, with a selected method and a truthful protection summary.
+
+Current: Paste invitation / QR frame.
+Preferred: Paste link, with protocol details handled after parsing.
+
+Current: Voice profiles.
+Preferred: Voice recognition under Advanced. Keep the technical term in its
+explanation where necessary.
+
+Current: Approved.
+Preferred: Reviewed, unless approval has a real workflow meaning.
+
+Current: The next app receives plaintext.
+Preferred: The app you choose will receive a readable copy.
+
+Current: Names and identifiers are replaced.
+Preferred: Review detected replacements before sending, followed by a clear
+statement that automatic detection can miss personal details.
+
+Current: Installed and hash verified.
+Preferred: Ready in normal setup. Keep integrity details in Advanced.
+
+Current: Firebase App Check token is invalid.
+Preferred: Cloud processing could not verify this app. Your existing notes
+are unchanged, if that state is confirmed. Show supported recovery actions
+and a Details section with the real error.
+
+8. GERMAN, HEBREW, AND ACCESSIBILITY
+
+Localize all strings, state labels, error messages, dates, times, durations,
+plural forms, and accessibility labels. Use the selected app language and
+appropriate device locale/time-format preferences deliberately. Avoid
+hardcoded English month names and AM/PM in German and Hebrew screens.
+
+Use start/end rather than left/right layout assumptions. Verify navigation,
+back arrows, icon placement, sheet actions, tab order, alignment, and focus
+in RTL. Do not blindly mirror content whose meaning depends on direction,
+such as a technical token or timeline. Isolate request IDs, model identifiers,
+URLs, hashes, and technical timestamps appropriately inside RTL text.
+
+Allow long German labels and Hebrew text to wrap. Do not fix clipping by
+shrinking text. The target is zero inaccessible horizontal overflow at
+compact phone widths and large system text sizes.
+
+Keep system status icons readable against the actual surface. Apply native
+status/navigation insets, keyboard insets, and safe-area handling. Do not
+paint a white status bar while keeping white icons. Test the navigation
+gesture area and buttons with gesture and button navigation.
+
+Expose semantic roles, state, and labels to TalkBack. Announce processing
+completion and errors without repeatedly announcing an animated waveform or
+timer. Maintain predictable focus when opening sheets and returning from
+dialogs. Ensure every control is reachable without precise tapping.
+
+9. NATIVE IMPLEMENTATION APPROACH
+
+Firebase is a backend/service platform, not a UI framework. Confirm the
+actual client stack before translating this document into code. If the
+Android app is Kotlin with Jetpack Compose, use native Material 3 primitives
+and a shared theme. If it uses another native client stack, apply the same
+interaction and state contract using that stack's established patterns.
+
+For Compose, the expected building blocks include a properly inset Scaffold,
+top app bars, a fixed navigation bar, lazy lists, appropriately sized modal
+bottom sheets, dialogs for short confirmations, and full screens for lengthy
+review/edit flows. Do not replace the native interface with a WebView just
+because the design reference was rendered as a mock.
+
+Use a small shared component set: meeting row/card, status chip, primary
+action, source reference, capability-aware option row, privacy preview, and
+state panel. A full new design-system framework is unnecessary.
+
+Map the redesign onto existing state and services before changing data
+models. Introduce only the minimum explicit state needed to stop invalid
+actions and false claims. Preserve task identifiers, persistence, version
+relationships, encryption, and existing security checks. UI changes must
+not silently change data retention, logging, network routing, or consent.
+
+10. IMPLEMENTATION PRIORITIES
+
+P0 - Usability and trust defects
+- Fix hidden buttons, clipped tabs, status-bar contrast, and bottom insets.
+- Replace the global navigation row and action rows with adaptive layouts.
+- Correct the no-speech/success confusion and remove raw placeholders.
+- Make processing location truthful per operation/result.
+- Verify local-only routing and prohibit silent cloud fallback.
+- Keep destructive actions separate and explain actual deletion scope.
+
+P1 - Main journey
+- Build Meetings, setup, recording, preparation, review, and sharing flow.
+- Add meaningful titles, clear states, and version-aware review behavior.
+- Consolidate share entry points and simplify receiving.
+- Make recording/model/privacy errors recoverable where supported.
+
+P2 - Visual consistency and language
+- Apply the complete blue/navy/light-surface theme and readable typography.
+- Add the restrained brand motif and useful motion.
+- Implement German/Hebrew localization and verify RTL and font scaling.
+- Move advanced AI, voice recognition, and diagnostics into Settings.
+
+P3 - Secondary refinements
+- Polish cloud payload review, link management, import failure messages,
+  model lifecycle details, and privacy activity.
+- Add only implemented features. Do not expand scope into accounts,
+  analytics, cloud backup, participant directories, or a chatbot without a
+  separate product decision.
+
+11. ACCEPTANCE CRITERIA
+
+Layout and accessibility
+- On compact phone widths, every primary action is visible or naturally
+  reachable by vertical scrolling, with no horizontal action overflow.
+- Essential actions remain reachable at large system font/display sizes.
+- System status/navigation bars are readable in light and dark appearances.
+- Touch targets, semantic labels, focus order, and contrast are verified.
+- German and Hebrew versions contain no hardcoded English dates or broken
+  bidi technical strings.
+
+User journey
+- A new user can identify where to start without choosing a model manually.
+- After finishing, the supported notes pipeline starts or presents one clear
+  justified next action.
+- A summary has an editable meaningful title and an accurate lifecycle state.
+- Editing a reviewed version visibly resets review status.
+- A user can find transcript references, sharing, receiving, and settings
+  without discovering a hidden scrolling tab row.
+- Draft sharing remains possible where currently supported and is labelled.
+
+Privacy and correctness
+- The configured local-only mode never invokes a cloud AI route, including
+  SDK fallback paths. Verify with observable network/service behavior.
+- A cloud request uses the exact reviewed payload; changes invalidate that
+  review. Audio exclusion is real, not only a label.
+- The UI never equates redaction with guaranteed anonymization.
+- Local, cloud-assisted, received, and unknown provenance display truthfully.
+- Link security, recipient access, expiration, and deletion wording match
+  the actual implementation and service behavior.
+- Voice annotation does not silently enroll or export a voice profile.
+- Deleting audio removes playback and audio sharing while preserving any
+  retained transcript references.
+- No-speech and blank content never become Reviewed-ready summaries.
+- Privacy logs contain only the intended operational metadata, not an
+  accidental copy of meeting text.
+
+Failure and recovery
+- Test microphone denial, interrupted recording, empty/silent input, missing
+  model, low storage, interrupted download, invalid model integrity, local
+  inference failure, offline cloud request, App Check rejection, expired
+  link, malformed QR, and decryption failure where those features exist.
+- Each failure states what remains available and offers a real next step.
+- Do not invent guaranteed recovery for ephemeral audio or unknown network
+  outcomes.
+
+Use representative real-device checks for recording, permissions, background
+behavior, and resource limits. Mock rendering and emulator screenshots cannot
+validate those behaviors. Benchmark model speed and language quality
+separately; this redesign makes no performance or compatibility guarantees.
+
+12. BUILD PROMPT FOR THE CODING AGENT
+
+Implement the proposed ContextFriend mobile redesign using the existing
+native client stack. First inspect the repository, its instruction files,
+navigation, theme, state holders, recording pipeline, model-readiness logic,
+cloud routing, sharing paths, retention behavior, and localization resources.
+Report material mismatches between this handoff and the actual implementation.
+
+Keep the work focused on a simpler, truthful user experience. Use Meetings,
+Receive, and Settings as the three visible main destinations. Build the
+recording-to-summary-to-review-to-share flow described above. Put advanced
+models, voice recognition, and diagnostics under Settings. Remove horizontal
+action overflow. Apply one coherent blue/navy/light-surface design system
+with a restrained warm accent and accessible native typography.
+
+Treat the mocks as design references with fictional content. Do not hardcode
+their titles, timestamps, durations, download sizes, privacy claims, model
+availability, or completion states as application data. Render from real
+capabilities and state. Do not add unsupported features merely because a
+mock illustrates a possible flow.
+
+Preserve security boundaries and data controls. Never introduce automatic
+cloud fallback, broaden a consent scope, enroll voice profiles implicitly,
+include extra material in sharing, or weaken App Check. Keep optional cloud
+processing explicit, preview the actual outgoing material, and label its
+result truthfully. Do not claim EU processing, end-to-end encryption,
+anonymization, or guaranteed deletion without confirming the implementation.
+
+Deliver the redesign in small coherent changes. Prioritize P0 defects, then
+the main journey, then visual and language polish. Validate narrow screens,
+font scaling, German/Hebrew RTL, system insets, and the meaningful state and
+recovery cases above. Provide a concise change summary, screenshots of the
+implemented screens, validation performed, and any remaining capability or
+policy decisions. Do not claim that the app is production-ready from this
+UI work alone.
+
+SOURCE MATERIAL
+
+The supplied screenshot boards:
+01-home-and-recording.png
+02-a-meeting.png
+03-meeting-templates.png
+04-cloud-notes-with-consent.png
+05-encrypted-cloud-link.png
+06-qr-scanner.png
+07-ai-and-privacy.png
+08-models.png
+
+The user's nine look-and-feel notes and ContextFriend project requirements
+also inform this proposal. Official framework and service documentation
+should be checked against the actual app versions before implementation.
+
+OFFICIAL IMPLEMENTATION REFERENCES
+
+These official sources support the platform guidance. They do not verify
+the app's actual code, configured services, encryption, data residency,
+retention, model compatibility, or measured performance.
+
+Android layout and navigation patterns:
+https://developer.android.com/design/ui/mobile/guides/layout-and-content/layout-and-nav-patterns
+Supports a small set of primary navigation destinations, with tabs used for
+secondary content organization. Meetings, Receive, and Settings are this
+proposal's product choice, not a platform requirement.
+
+Compose edge-to-edge setup:
+https://developer.android.com/develop/ui/compose/system/setup-e2e
+Guidance for system bars, icon appearance, and insets. Verify both status-bar
+legibility and content placement rather than changing only the background.
+
+Android accessibility foundations:
+https://developer.android.com/design/ui/mobile/guides/foundations/accessibility
+Supports minimum 48dp interaction targets and appropriate contrast checks,
+including 4.5:1 for ordinary text and 3:1 for relevant non-text controls.
+Validate actual final color, typography, and state combinations.
+
+Material 3 in Compose:
+https://developer.android.com/develop/ui/compose/designsystems/material3
+Explains theme color schemes, typography, shapes, and dynamic color. A
+coherent app scheme prevents the screenshot's mix of brand blue actions
+and unrelated default lavender surfaces. Dynamic colors can vary with the
+user's wallpaper and must be an intentional product decision.
+
+BidiFormatter:
+https://developer.android.com/reference/androidx/core/text/BidiFormatter
+Reference for formatting mixed-direction text such as technical identifiers
+inside Hebrew content. The implementation must still be visually checked
+with realistic RTL strings and interactive layouts.
+
+DateTimeFormatter:
+https://developer.android.com/reference/java/time/format/DateTimeFormatter
+Reference for localized date/time formatting. Select locale and time-format
+behavior intentionally and account for the actual Android compatibility
+configuration in the repository.
+
+Gemini Nano and hybrid AI:
+https://developer.android.com/ai/gemini-nano
+The documented hybrid approach can automatically fall back to cloud. For
+ContextFriend, explicitly prevent fallback in local-only operation. Do not
+assume a local-first SDK setting guarantees local-only execution.
+
+Firebase AI Logic App Check:
+https://firebase.google.com/docs/ai-logic/app-check
+Reference for protecting AI Logic access with App Check. Improve user-facing
+error handling while preserving verification. Do not disable the protection
+as a UI workaround.

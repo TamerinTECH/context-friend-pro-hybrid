@@ -76,6 +76,6 @@ user's list of names to protect, with genitive, possessive and hyphenated forms)
 honorifics and cue words ("Frau …", "Mr …", "my son …"), e-mail addresses, phone numbers, dates,
 street addresses and postcodes, IBANs, links, long ID numbers and school names.
 
-It can miss an unusual name that nobody listed. That is why the privacy panel shows the full
+It can miss an unusual name that nobody listed. That is why the "Review what you send" screen shows the full
 outgoing text, offers capitalised words that might be names as one-tap redactions (English), and
 requires an explicit consent each time. It is a safeguard, not a legal guarantee of anonymity.

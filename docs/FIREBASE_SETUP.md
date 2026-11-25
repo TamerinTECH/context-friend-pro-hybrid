@@ -119,5 +119,5 @@ Supported: Pixel 10 and 11 families and other Gemini Nano 4 devices on the
    (on Pixel: Settings → your name → All services → System services).
 2. Turn on Developer options (tap Build number seven times).
 3. Settings → System → Developer options → **AICore Settings** → **Enable AICore Developer Preview** → Accept.
-4. Open ContextFriend Pro → **AI & privacy** → the Gemini Nano card shows *Ready*, or tap
+4. Open ContextFriend Pro → **Settings → On-device AI** → the Gemini Nano card shows *Ready*, or tap
    **Download Gemini Nano** (Wi-Fi; a few minutes).

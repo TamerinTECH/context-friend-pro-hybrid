@@ -25,20 +25,24 @@ Judging 10–16 Dec; the app and the Firebase project stay free and available un
 
 - [x] Public repo, Apache-2.0 detected, disclosure of pre-existing code, CHANGELOG.
 - [x] Firebase AI Logic imported and called at runtime (`Hybrid.kt`), per-task inference modes.
-- [x] Privacy core, policy, notes pipeline, cloud draft, encrypted links: 75 unit tests, CI green.
+- [x] Privacy core, policy, notes pipeline, cloud draft, encrypted links: 90 unit tests, CI green.
+- [x] Redesign after the design review (25 Nov), checked on the emulator in English, German and Hebrew
+      (docs/design/, TEST_REPORT.md). Status lists: docs/DONE.md and docs/PENDING.md.
+- [x] Logo assets: app icons, notification icon, Play icon and feature graphic, Devpost thumbnail (docs/brand/).
 - [x] Firebase project `contextfriend-pro-hybrid` (24 Nov): Android app, local.properties, Firestore
       in eur3 + rules, Remote Config template, anonymous Auth.
 - [x] After Blaze: Firestore TTL deployed (24 Nov, `expiresAt`; Firestore needs up to a day to activate it).
-- [ ] Read back the TTL state as ACTIVE (`gcloud firestore fields ttls list`).
+- [ ] Read back the TTL state as ACTIVE (`gcloud firestore fields ttls list`; needs `gcloud auth login` again).
 - [ ] Decide on App Check enforcement for Firestore (AI Logic is already enforced).
 - [ ] Phone checks on the Pixel (fill in docs/TEST_REPORT.md with real numbers):
-  - [ ] Gemini Nano 4 status, download, notes from the demo meeting; badge shows ON_DEVICE.
+  - [ ] Gemini Nano 4 status, download, notes from the demo meeting; label "Created on this phone · Gemini Nano".
   - [ ] Offline (airplane mode): does Firebase AI Logic on-device work without network and App Check?
   - [ ] AICore quota/BUSY behaviour on a 30-minute recording.
   - [ ] Cloud notes via `eu`: placeholders out, names back; badge IN_CLOUD; audit entry. Emulator
         reaches AI Logic in `eu` and is refused by App Check (24 Nov); retry after the debug token.
   - [x] Remote Config kill switch → local-only mode (emulator, 24 Nov).
-  - [~] Encrypted link: created and opened on the emulator (24 Nov); phone ↔ emulator still to do.
+  - [~] Encrypted link: created and opened on the emulator (24 Nov; again through the new Share and Receive
+        screens 25 Nov); phone ↔ emulator still to do.
 - [ ] Release APK signed, published as a GitHub Release with checksums.
 - [ ] README and TESTING.md: remove "(phone check pending)" markers or correct the claims.
 - [ ] Final scan: `git log -p` for keys, tokens, real names; no personal data anywhere.

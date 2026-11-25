@@ -1,0 +1,119 @@
+{
+  "name": "ContextFriend - Quiet Blue",
+  "status": "Proposed visual specification, not production code or implementation verification",
+  "date": "2026-11-25",
+  "colors": {
+    "light": {
+      "background": "#F7F8FA",
+      "surface": "#FFFFFF",
+      "surfaceContainer": "#EEF2F7",
+      "onBackground": "#162E51",
+      "onSurface": "#162E51",
+      "onSurfaceVariant": "#5F6E83",
+      "primary": "#245FD6",
+      "onPrimary": "#FFFFFF",
+      "primaryContainer": "#EAF1FF",
+      "onPrimaryContainer": "#163B85",
+      "accent": "#F6C453",
+      "onAccent": "#162E51",
+      "success": "#177353",
+      "successContainer": "#E8F4EF",
+      "warning": "#79520C",
+      "warningContainer": "#FFF3D6",
+      "error": "#A72C36",
+      "errorContainer": "#FDECEE",
+      "outline": "#718098",
+      "divider": "#DCE4F0"
+    },
+    "dark": {
+      "background": "#101B2C",
+      "surface": "#192940",
+      "surfaceContainer": "#233650",
+      "onBackground": "#F4F7FC",
+      "onSurface": "#F4F7FC",
+      "onSurfaceVariant": "#B5C3D6",
+      "primary": "#9AB8FF",
+      "onPrimary": "#102748",
+      "primaryContainer": "#253F67",
+      "onPrimaryContainer": "#D9E7FF",
+      "accent": "#F6C453",
+      "onAccent": "#162E51",
+      "success": "#89DBB5",
+      "successContainer": "#163F35",
+      "warning": "#F2D291",
+      "warningContainer": "#493811",
+      "error": "#FFB4BB",
+      "errorContainer": "#53232B",
+      "outline": "#899BB6",
+      "divider": "#334863"
+    },
+    "recording": {
+      "background": "#162E51",
+      "foreground": "#FFFFFF",
+      "secondary": "#CDDAEF",
+      "wavePrimary": "#71A3FF",
+      "waveAccent": "#F6C453",
+      "recordingIndicator": "#FF7979"
+    }
+  },
+  "typography": {
+    "fontFamily": "Platform system sans with native Hebrew and German support",
+    "display": {"sizeSp": 30, "lineHeightSp": 36, "weight": 600},
+    "headline": {"sizeSp": 24, "lineHeightSp": 30, "weight": 600},
+    "title": {"sizeSp": 20, "lineHeightSp": 26, "weight": 600},
+    "body": {"sizeSp": 16, "lineHeightSp": 24, "weight": 400},
+    "supporting": {"sizeSp": 14, "lineHeightSp": 20, "weight": 400},
+    "button": {"sizeSp": 16, "lineHeightSp": 22, "weight": 600},
+    "timer": {"sizeSp": 58, "lineHeightSp": 68, "weight": 500, "tabularNumbers": true},
+    "notes": "Respect platform text scaling. Do not shrink essential text or fix height to fit translations. Consent and privacy disclosures use readable body or supporting text."
+  },
+  "dimensionsDp": {
+    "spacing": [4, 8, 12, 16, 20, 24, 32, 48],
+    "pagePadding": 20,
+    "cardPadding": 20,
+    "touchTargetMinimum": 48,
+    "primaryButtonMinimumHeight": 52,
+    "cardCornerRadius": 20,
+    "sheetCornerRadius": 28,
+    "buttonCornerRadius": 16,
+    "iconSize": 24,
+    "inlineIconSize": 20,
+    "notes": "Minimums are not fixed heights. System bars, display cutouts, IME and native navigation remain inside safe layout constraints."
+  },
+  "motion": {
+    "standardDurationMs": 180,
+    "emphasizedDurationMs": 240,
+    "reducedMotionDurationMs": 0,
+    "notes": "No perpetual decorative animation. Live waveform only from real microphone signal. Progress indicators only reflect real work."
+  },
+  "navigation": {
+    "rootDestinations": ["Meetings", "Receive", "Settings"],
+    "meetingTabs": ["Summary", "Transcript"],
+    "recordingAction": "New recording",
+    "draftPrimaryAction": "Mark as reviewed",
+    "reviewedPrimaryAction": "Share summary"
+  },
+  "semanticRules": [
+    "Use semantic tokens, not per-component lavender defaults.",
+    "Use navy text on yellow, never small white text on yellow.",
+    "Pair status color with a readable status label.",
+    "Only show a local provenance badge for a result known to have been produced locally.",
+    "Storage location is separate from processing location.",
+    "No speech is an empty/error outcome, not a reviewable summary.",
+    "Review applies to a content version and resets after substantive edits or regeneration.",
+    "Recording is an action, not a bottom-navigation destination.",
+    "Keep the paired-eye motif small and restrained. It is a proposed concept mark, not an approved brand replacement.",
+    "Use logical start/end layout and isolate technical LTR values inside RTL text.",
+    "Keep the hero compact after initial use so real meetings remain visible."
+  ],
+  "validation": {
+    "normalTextContrastTarget": 4.5,
+    "nonTextControlContrastTarget": 3,
+    "platformTouchTargetDp": 48,
+    "fontScaleCases": [1.0, 1.3, 2.0],
+    "widthCasesDp": [320, 360, 390, 430],
+    "languages": ["en", "de", "he"],
+    "themes": ["light", "dark"],
+    "notes": "Proposed acceptance targets. Native device and TalkBack verification still required; browser mock validation cannot certify native behavior."
+  }
+}

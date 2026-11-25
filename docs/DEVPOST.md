@@ -108,7 +108,7 @@ domain knowledge of school meetings and teachers' workflows. ContextFriend Pro's
 recorder prototype (transcription, speakers, Gemma notes, encrypted vault, phone-to-phone sharing)
 was written between 27 Oct and 6 Nov 2026 and is disclosed as the first commit of the repository.
 Built during the submission period: Firebase AI Logic hybrid inference (Gemini Nano on-device,
-Gemini in the cloud), the routing policy, the pseudonymiser and privacy panel, re-identification,
+Gemini in the cloud), the routing policy, the pseudonymiser and the "Review what you send" screen, re-identification,
 the privacy log and badges, meeting templates, App Check, Authentication, Remote Config, the
 encrypted Firestore links, CI and all tests. See `docs/PRE_EXISTING.md` and `CHANGELOG.md`.
 

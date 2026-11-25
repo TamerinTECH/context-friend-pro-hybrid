@@ -17,6 +17,8 @@ class CloudDraft private constructor(
     val sessionId: String,
     val revision: String,
     val prompt: String,
+    /** The meeting lines inside [prompt], already redacted: what the review screen shows first. */
+    val rows: List<SourceRow>,
     val counts: Map<Entity, Int>,
     val risk: ResidualRisk,
     private val ids: Map<String, String>,
@@ -60,7 +62,7 @@ class CloudDraft private constructor(
             val redacted = Prompts.redactedRows(rows, pseudonymizer)
             val prompt = Prompts.notes(session.language, MeetingTemplate.of(session.template), redacted, redacted = true)
             val risk = pseudonymizer.residualRisk(redacted.joinToString("\n") { listOfNotNull(it.speaker, it.text).joinToString(": ") }, session.language)
-            return CloudDraft(session.id, session.revision, prompt, pseudonymizer.counts(), risk, ids, pseudonymizer)
+            return CloudDraft(session.id, session.revision, prompt, redacted, pseudonymizer.counts(), risk, ids, pseudonymizer)
         }
 
         private val GENERIC_SPEAKER = Regex("Speaker \\d+|Sprecher(in)? \\d+|דובר \\d+")

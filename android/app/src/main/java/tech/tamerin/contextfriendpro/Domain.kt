@@ -27,7 +27,9 @@ fun validId(s: String): Boolean = runCatching { UUID.fromString(s).toString() ==
 }
 @Serializable data class Gap(val startMs: Long, val endMs: Long?, val reason: String)
 @Serializable data class Stage(val state: String = "pending", val completedWindows: Int = 0, val modelHash: String? = null, val error: String? = null)
-@Serializable data class Revision(val id: String, val transcript: List<Segment>, val summary: Summary?, val editedSummary: String?, val approved: Boolean)
+@Serializable data class Revision(val id: String, val transcript: List<Segment>, val summary: Summary?, val editedSummary: String?, val approved: Boolean,
+    /** Where these notes came from, so an earlier version (for example the on-device notes before a cloud run) can be restored. */
+    val notes: NotesProvenance? = null)
 @Serializable data class Session(val id: String = newId(), val title: String, val createdAt: Long = System.currentTimeMillis(),
     val timezone: String = java.util.TimeZone.getDefault().id, val language: String = "en", val state: String = "recorded",
     val durationMs: Long = 0, val gaps: List<Gap> = emptyList(), val transcript: List<Segment> = emptyList(), val summary: Summary? = null,
@@ -36,10 +38,13 @@ fun validId(s: String): Boolean = runCatching { UUID.fromString(s).toString() ==
     val suggestedProfiles: Map<String,String> = emptyMap(), val speakerVectors: Map<String,List<Float>> = emptyMap(), val audioRetained: Boolean = true, val received: Boolean = false,
     val senderStatus: String? = null, val sourceBundle: String? = null,
     /** Hackathon edition: meeting template id and where the current notes came from. */
-    val template: String = "general", val notes: NotesProvenance? = null) {
+    val template: String = "general", val notes: NotesProvenance? = null,
+    /** The user named this meeting: new notes keep the name instead of the generated title. */
+    val customTitle: Boolean = false) {
     val approved: Boolean get() = approvedRevision == revision
     fun edited(): Session = copy(revision = newId(), approvedRevision = null, state = "needs_review",
-        history = (history + Revision(revision,transcript,summary,editedSummary,approved)).takeLast(20))
+        history = (history + snapshot()).takeLast(20))
+    fun snapshot(): Revision = Revision(revision,transcript,summary,editedSummary,approved,notes)
     fun summaryText(): String = editedSummary ?: summary?.plain().orEmpty()
 }
 @Serializable data class AudioChunk(val index: Int, val startMs: Long, val sampleRate: Int = 16000, val pcm: String, val samples: Int)

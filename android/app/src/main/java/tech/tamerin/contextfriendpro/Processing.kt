@@ -151,7 +151,8 @@ class Processing(private val app: ProApp) {
                 Audit.add(app.vault,AuditEntry(action="policy_violation",engine=model.engine.id,model=model.modelName,reason=e.message,meeting=Audit.meetingRef(id)))
                 throw e
             }
-            app.vault.update(id) {it.copy(title=summary.title,summary=summary,editedSummary=null,state="needs_review",revision=newId(),approvedRevision=null,
+            app.vault.update(id) {it.copy(title=if(it.customTitle)it.title else summary.title,summary=summary,editedSummary=null,state="needs_review",revision=newId(),approvedRevision=null,
+                history=it.keepPrevious(),
                 notes=NotesProvenance(model.engine.id,model.modelName,onDeviceCalls=model.calls),
                 stages=it.stages+("summary" to Stage("done",modelHash=if(model.engine==NotesEngine.GEMMA_LOCAL)app.models.entry(pref.summaryModel).sha256 else null)))}
             Audit.add(app.vault,AuditEntry(action="notes",engine=model.engine.id,model=model.modelName,source=Audit.sourceOf(model.engine),
@@ -178,7 +179,8 @@ class Processing(private val app: ProApp) {
                 }
                 is CloudOutcome.Done -> {
                     val summary=outcome.summary
-                    app.vault.update(draft.sessionId) {it.copy(title=summary.title,summary=summary,editedSummary=null,state="needs_review",revision=newId(),approvedRevision=null,
+                    app.vault.update(draft.sessionId) {it.copy(title=if(it.customTitle)it.title else summary.title,summary=summary,editedSummary=null,state="needs_review",revision=newId(),approvedRevision=null,
+                        history=it.keepPrevious(),
                         notes=NotesProvenance(model.engine.id,label,cloudCalls=model.calls,redactedEntities=draft.redactedTotal))}
                     Audit.add(app.vault,AuditEntry(action="cloud_notes",engine=model.engine.id,model=label,source="IN_CLOUD",calls=model.calls,
                         redacted=counts,charsSent=draft.prompt.length,consent=true,meeting=ref))
