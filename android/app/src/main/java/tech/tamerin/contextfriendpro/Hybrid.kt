@@ -16,6 +16,7 @@ import com.google.firebase.ai.OnDeviceModelOption
 import com.google.firebase.ai.OnDeviceModelStatus
 import com.google.firebase.ai.type.FirebaseAIException
 import com.google.firebase.ai.type.FirebaseAIOnDeviceInvalidRequestException
+import com.google.firebase.ai.type.FirebaseAIOnDeviceNotAvailableException
 import com.google.firebase.ai.type.GenerativeBackend
 import com.google.firebase.ai.type.PublicPreviewAPI
 import com.google.firebase.ai.type.generationConfig
@@ -105,7 +106,7 @@ object Hybrid {
 
     private fun ai(): FirebaseAI = FirebaseAI.getInstance(firebase ?: error("firebase_not_configured"), GenerativeBackend.agentPlatform(location))
 
-    private fun modelOption() = when (config.nanoModelOption.uppercase()) {
+    fun modelOption() = when (config.nanoModelOption.uppercase()) {
         "STABLE" -> OnDeviceModelOption.STABLE
         "PREVIEW_FAST" -> OnDeviceModelOption.PREVIEW_FAST
         else -> OnDeviceModelOption.PREVIEW // Gemini Nano 4 Full on Pixel 10/11 with the AICore Developer Preview
@@ -114,10 +115,10 @@ object Hybrid {
     private val jsonOutput = generationConfig { responseMimeType = "application/json" }
 
     /** The only on-device model the app builds: ONLY_ON_DEVICE, never a PREFER_* mode. */
-    fun onDeviceModel(json: Boolean): GenerativeModel = ai().generativeModel(
+    fun onDeviceModel(json: Boolean, option: OnDeviceModelOption = modelOption(), thinking: Boolean? = false): GenerativeModel = ai().generativeModel(
         modelName = config.cloudModel, // required by the SDK even for on-device requests
         generationConfig = if (json) jsonOutput else null,
-        onDeviceConfig = OnDeviceConfig(mode = InferenceMode.ONLY_ON_DEVICE, temperature = 0.2f, modelOption = modelOption(), enableThinking = false),
+        onDeviceConfig = OnDeviceConfig(mode = InferenceMode.ONLY_ON_DEVICE, temperature = 0.2f, modelOption = option, enableThinking = thinking),
     )
 
     fun cloudModel(): GenerativeModel = ai().generativeModel(
@@ -144,26 +145,50 @@ object Hybrid {
     fun downloadNano(): Flow<DownloadStatus> = if (!ready) emptyFlow() else onDeviceModel(false).onDeviceExtension?.download() ?: emptyFlow()
 }
 
-class NanoNotes(override val modelName: String) : NotesModel {
+class NanoNotes(name: String) : NotesModel {
     override val engine = NotesEngine.GEMINI_NANO
+    override var modelName = name
+        private set
     override var calls = 0
         private set
-    private var json = true
-    private val withJson by lazy { Hybrid.onDeviceModel(json = true) }
-    private val plain by lazy { Hybrid.onDeviceModel(json = false) }
+
+    /** One way of asking Gemini Nano. Phones differ in what they accept; the first variant that answers is kept. */
+    private data class Variant(val option: OnDeviceModelOption, val json: Boolean, val thinking: Boolean?)
+    // The configured model first (Gemini Nano 4 preview on Pixel 10/11), then the stable Gemini Nano of every supported
+    // phone. For each: JSON output with thinking off, plain prompting, then the model's own defaults.
+    private val variants = listOf(Hybrid.modelOption(), OnDeviceModelOption.STABLE).distinct().flatMap { option ->
+        listOf(Variant(option, true, false), Variant(option, false, false), Variant(option, false, null))
+    }
+    private var v = 0
+    private var warmedUp = false
+    private val models = mutableMapOf<Int, GenerativeModel>()
+    private fun model() = models.getOrPut(v) { variants[v].let { Hybrid.onDeviceModel(it.json, it.option, it.thinking) } }
+    private fun describe() = variants[v].let { "option=${if (it.option == OnDeviceModelOption.STABLE) "stable" else "configured"} json=${it.json} thinking=${it.thinking}" }
 
     override suspend fun complete(prompt: String): String {
         var attempt = 0
         while (true) {
             try {
-                val response = (if (json) withJson else plain).generateContent(prompt)
+                val response = model().generateContent(prompt)
                 Policy.verifySource(engine, response.inferenceSource == InferenceSource.ON_DEVICE)
+                if (calls == 0) android.util.Log.i("Nano", "answered with ${describe()}")   // settings only, never content
                 calls++
                 return response.text ?: throw IllegalStateException("empty_answer")
             } catch (e: FirebaseAIOnDeviceInvalidRequestException) {
                 // If JSON output is not accepted on this device, ask for JSON in the prompt only; otherwise the input is too long.
-                if (json) { json = false; continue }
+                if (variants[v].json) { v++; continue }
                 throw InputTooLong(e)
+            } catch (e: FirebaseAIOnDeviceNotAvailableException) {
+                // ErrorCode 8: this way of asking is not available on this phone (AICore: "Feature not available for
+                // performing inference"), although checkStatus() says AVAILABLE. Warm the model up once, then the next variant.
+                android.util.Log.w("Nano", "not available with ${describe()}")
+                if (!warmedUp) { warmedUp = true; runCatching { model().onDeviceExtension?.warmUp() }; continue }
+                if (v < variants.lastIndex) {
+                    v++
+                    if (variants[v].option == OnDeviceModelOption.STABLE) modelName = "gemini-nano · stable"
+                    continue
+                }
+                throw NanoNotReady(e)
             } catch (e: FirebaseAIException) {
                 // AICore answers BUSY on bursts; back off exponentially (ML Kit Prompt API guidance).
                 if (attempt < 4 && e.message.orEmpty().contains("BUSY", ignoreCase = true)) { delay(1500L shl attempt); attempt++; continue }

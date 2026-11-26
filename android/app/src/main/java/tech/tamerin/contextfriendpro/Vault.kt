@@ -87,8 +87,10 @@ class Vault(private val context: Context,namespace: String="vault") {
                 val key=sessionKey(s.id)
                 try { chunks(s.id).forEach { n -> val c=readChunk(s.id,n,key);duration=maxOf(duration,c.startMs+c.samples*1000L/c.sampleRate) } }
                 finally {key.fill(0)}
-                save(s.copy(state="interrupted",durationMs=duration,gaps=if(s.state in listOf("recording","paused"))
-                    s.gaps+Gap(duration,null,"process_interrupted_uncommitted_tail_unknown") else s.gaps))
+                // A recording cut off by a killed app is interrupted; a meeting whose notes were cut off only waits:
+                // its audio is complete and the finished windows are kept, so it continues by itself (ProApp.resumePending).
+                save(if(s.state in listOf("recording","paused")) s.copy(state="interrupted",durationMs=duration,
+                    gaps=s.gaps+Gap(duration,null,"process_interrupted_uncommitted_tail_unknown")) else s.copy(state="queued",durationMs=duration))
             }
         }
     }

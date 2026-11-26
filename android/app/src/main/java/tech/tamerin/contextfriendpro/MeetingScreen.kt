@@ -21,6 +21,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
@@ -53,11 +55,13 @@ import java.util.concurrent.atomic.AtomicBoolean
     DisposableEffect(Unit) { onDispose { stopPlay.set(true) } }
     KeepScreenOn(busy)
 
-    fun process() { scope.launch { engine.run(s.id) } }
+    // Through the background service, so the notes keep coming with the screen off. In the rare case Android
+    // refuses the service, the work runs here while the app is open.
+    fun process() { if (!app.startProcessing(s.id)) scope.launch { engine.run(s.id) } }
     fun regenerate() {
         scope.launch {
             withContext(Dispatchers.IO) { app.vault.update(s.id) { it.copy(stages = it.stages - "summary") } }
-            app.changed(); engine.run(s.id)
+            app.changed(); if (!app.startProcessing(s.id)) engine.run(s.id)
         }
     }
     fun play(from: Long = 0, until: Long? = null) {
@@ -120,7 +124,8 @@ import java.util.concurrent.atomic.AtomicBoolean
                 }
             }
             when {
-                phase == Phase.PROCESSING -> item { ProcessingPanel(ui, s, onBack) { engine.cancel() } }
+                phase == Phase.PROCESSING -> item { ProcessingPanel(ui, s, onBack, onCancel = { engine.cancel() }) }
+                phase == Phase.WAITING -> item { ProcessingPanel(ui, s, onBack, waiting = true, canContinue = ready && recordingId == null, onContinue = ::process) }
                 phase == Phase.RECORDING -> item { Note(t("recording_in_progress"), Glyphs.Mic) }
                 phase == Phase.NO_SPEECH -> item { NoSpeechPanel(ui, s, onNewRecording, onBack) }
                 phase == Phase.NOT_PROCESSED || phase == Phase.FAILED || phase == Phase.INTERRUPTED -> item {
@@ -282,11 +287,21 @@ fun originLabel(ui: Ui, notes: NotesProvenance?): String = when (notes?.engine) 
     }
 }
 
-@Composable private fun ProcessingPanel(ui: Ui, s: Session, onBack: () -> Unit, onCancel: () -> Unit) {
+/** Live progress while the notes are made; the same panel, paused, for a meeting that continues by itself later. */
+@Composable private fun ProcessingPanel(ui: Ui, s: Session, onBack: () -> Unit, onCancel: () -> Unit = {},
+                                        waiting: Boolean = false, canContinue: Boolean = false, onContinue: () -> Unit = {}) {
     val t = ui.t
+    val progress by ui.app.progress.collectAsState()
+    val share = progress?.takeIf { it.first == s.id }?.second ?: if (waiting) s.donePercent() / 100f else null
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        Heading(t("processing_heading"))
+        Heading(t(if (waiting) "waiting_heading" else "processing_heading"))
         Text(t("processing_where"), style = MaterialTheme.typography.bodyLarge, color = Brand.Muted)
+        if (share != null) {
+            Text(ui.tf("processing_percent", "n" to (share * 100).toInt()), style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.semantics { liveRegion = androidx.compose.ui.semantics.LiveRegionMode.Polite })
+            LinearProgressIndicator(progress = { share }, modifier = Modifier.fillMaxWidth().height(8.dp), color = Brand.Primary,
+                trackColor = Brand.PrimaryContainer, strokeCap = androidx.compose.ui.graphics.StrokeCap.Round)
+        }
         s.steps().forEach { (step, state) ->
             Panel(color = if (state == StepState.CURRENT) Brand.PrimaryContainer else Brand.Surface,
                 border = if (state == StepState.CURRENT) Brand.PrimaryContainer else Brand.Divider) {
@@ -297,13 +312,22 @@ fun originLabel(ui: Ui, notes: NotesProvenance?): String = when (notes?.engine) 
                         if (step == Step.SPEECH && state == StepState.CURRENT && s.durationMs > 0)
                             Text(ui.tf("step_speech_progress", "done" to clock(s.transcribedMs()), "total" to clock(s.durationMs)),
                                 style = MaterialTheme.typography.bodyMedium, color = Brand.Muted)
+                        if (step == Step.SPEAKERS && state == StepState.CURRENT && s.durationMs > 0)
+                            Text(ui.tf("step_speech_progress", "done" to clock(s.speakersMs()), "total" to clock(s.durationMs)),
+                                style = MaterialTheme.typography.bodyMedium, color = Brand.Muted)
                     }
                 }
             }
         }
-        Text(t("processing_keep_open"), style = MaterialTheme.typography.bodyMedium, color = Brand.Muted)
-        PrimaryButton(t("back_to_meetings"), onBack)
-        TextButton(onClick = onCancel, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("cancel_processing")) }
+        if (waiting) {
+            Text(t(if (s.state == "notes_waiting") "waiting_screen" else "waiting_note"), style = MaterialTheme.typography.bodyMedium, color = Brand.Muted)
+            PrimaryButton(t("continue_now"), onContinue, enabled = canContinue)
+            SecondaryButton(t("back_to_meetings"), onBack)
+        } else {
+            Text(t("processing_keep_open"), style = MaterialTheme.typography.bodyMedium, color = Brand.Muted)
+            PrimaryButton(t("back_to_meetings"), onBack)
+            TextButton(onClick = onCancel, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("cancel_processing")) }
+        }
     }
 }
 
@@ -329,7 +353,13 @@ fun originLabel(ui: Ui, notes: NotesProvenance?): String = when (notes?.engine) 
         when (phase) {
             Phase.FAILED -> Note(code?.let { t("reason_$it") } ?: t("reason_stage_failed_retry_or_check_models"), Icons.Default.Warning,
                 Brand.ErrorContainer, Brand.Error, title = t("failed_title"))
-            Phase.INTERRUPTED -> Note(t("interrupted_text"), Icons.Default.Warning, Brand.WarningContainer, Brand.Warning, title = t("interrupted_title"))
+            Phase.INTERRUPTED -> {
+                Note(t("interrupted_text"), Icons.Default.Warning, Brand.WarningContainer, Brand.Warning, title = t("interrupted_title"))
+                s.gaps.lastOrNull { it.reason != "user_pause" }?.let { gap ->
+                    Text(ui.tf("interrupted_reason", "time" to clock(gap.startMs), "reason" to t("gap_${gap.reason}")),
+                        style = MaterialTheme.typography.bodyMedium, color = Brand.Muted)
+                }
+            }
             else -> Panel {
                 Text(t("not_processed_title"), style = MaterialTheme.typography.titleMedium)
                 Text(t("not_processed_text"), style = MaterialTheme.typography.bodyLarge, color = Brand.Muted)

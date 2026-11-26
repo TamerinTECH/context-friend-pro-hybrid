@@ -437,3 +437,35 @@ English content was mirrored in the Hebrew UI.
 
 Not checked here (needs the Pixel): Gemini Nano, real speech, cloud notes, QR scanning of a real code,
 phone-to-phone transfer.
+
+### Pixel 11 Pro — 26 November 2026
+
+Debug build on the Pixel 11 Pro (Android 17, AICore 26.10.15), live Firebase project. Speech: an English
+podcast about AI played on the PC through a Jabra Speak 510 speakerphone about a metre from the phone.
+
+| Check | Result |
+|---|---|
+| Notes start after a recording, in the background | PASS: "Finish recording" starts the processing service at once (notification with percent), also after an interrupted recording |
+| Continue after the app is killed | PASS: three reinstalls during processing; the 44-minute and the 12-minute meetings continued from their saved windows ("Creating notes · 34 %" right after launch) |
+| Percent done | PASS: meeting screen, list chip, notification |
+| Record while notes are made | PASS: "New recording" available; the running notes paused (only the recording service ran) and continued after "Finish" |
+| Speech to text speed | About 3–4× faster than real time with the optimised engines: 24 % → 53 % of the 44-minute meeting (about 20 minutes of audio) in about 6 minutes, including two restarts |
+| Sound indicator | PASS after fix: "Sound is coming in, but quietly…" and "Sound heard: 05:26" for the speakerphone. Before the fix the screen said "No sound yet" throughout |
+| Gemini Nano notes, 12-minute meeting | PASS: "Created on this phone · Gemini Nano", model `nano-v4-full`, 5 on-device requests; every point has sources inside the podcast part (06:11–10:40); about 8 minutes from "Finish" to notes, with two reinstalls in between |
+| Gemini Nano notes, 3-minute meeting | PASS: 13 s for the notes (speech and speakers were done) |
+| Gemini Nano before AICore was ready | Refused with ErrorCode 8 although `checkStatus()` said AVAILABLE (AICore log: "Feature not available for performing inference: 647"). The app now names it ("Gemini Nano is not ready on this phone yet"). After AICore's own chat had been opened, the first request variant (preview model, JSON) answered |
+| Recording notification | PASS after fix: channel importance 3 (was "Silent"), Pause and Finish, visible on the lock screen without the title; a notification tap from Settings returned to the recording screen |
+| JVM unit tests | 97/97 PASS |
+
+Found and fixed in this run: processing lived in the screen and died with the app; the 44-minute meeting
+of 25 November ended "interrupted" and was never processed; debug builds ran the native engines at -O0;
+"New recording" was blocked while notes were made; quiet speech showed as "No sound yet"; the recording
+notification sat under "Silent" with only "Stop"; a "Creating notes" notification could stay after
+processing; processing failures were not logged.
+
+Not an app defect: the 44-minute meeting of 25 November holds no speech. The PC played the video without
+sound (Chrome had no audio session; the speakerphone's output meter stayed at 0), so the phone recorded
+silence. The old level display hid this; the new one shows it.
+
+Still open on the Pixel: cloud notes through `eu`, QR and phone-to-phone transfer, airplane mode,
+screenshots in three languages.

@@ -121,7 +121,7 @@ private val QuietShapes = Shapes(
         val start = bars - values.size
         for (i in 0 until bars) {
             val level = values.getOrNull(i - start) ?: 0f
-            val scaled = (kotlin.math.sqrt(level.coerceIn(0f, 1f)) * 1.6f).coerceIn(0.06f, 1f)
+            val scaled = (level * 1.3f).coerceIn(0.06f, 1f)   // levels are already on a decibel scale
             val h = size.height * scaled
             val color = if (i % 3 == 1) Brand.Accent else Brand.WaveBlue
             drawRoundRect(color, topLeft = Offset(i * slot + (slot - barWidth) / 2, (size.height - h) / 2),

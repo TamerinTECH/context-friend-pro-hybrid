@@ -40,7 +40,7 @@ private val ROOTS = listOf(Screen.Meetings, Screen.Receive, Screen.Settings)
     var sessions by remember { mutableStateOf<List<Session>>(emptyList()) }
     var error by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-    val engine = remember { Processing(app) }
+    val engine = app.engine
     val act: (suspend () -> Unit) -> Unit = { block -> scope.launch { try { withContext(Dispatchers.IO) { block() }; app.changed() } catch (e: CancellationException) { throw e } catch (_: Exception) { error = true } } }
     val ui = remember(pref.language, dictionaries) { Ui(app, pref.language, dictionaries, act) }
 
@@ -59,8 +59,12 @@ private val ROOTS = listOf(Screen.Meetings, Screen.Receive, Screen.Settings)
     // nested BackHandlers do not reliably take priority after the activity restarts.
     BackHandler(enabled = stack.size > 1 && screen !is Screen.Edit && screen !is Screen.Cloud) { back() }
 
-    // Recording ends -> open the meeting and start the notes on this phone. Nothing ever goes to the cloud here.
+    // Recording ends -> open the meeting. The recording service has already started its notes in the background
+    // service (ProcessingService), also when the app was not on screen. Nothing ever goes to the cloud here.
     var recordingId by remember { mutableStateOf<String?>(null) }
+    // A tap on the recording notification: back to the recording, wherever the app was.
+    val openRecording by app.openRecording.collectAsState()
+    LaunchedEffect(openRecording) { if (openRecording > 0 && recording.sessionId != null && screen != Screen.Recording) go(Screen.Recording) }
     LaunchedEffect(recording.sessionId) {
         val id = recording.sessionId
         if (id != null) {
@@ -69,12 +73,6 @@ private val ROOTS = listOf(Screen.Meetings, Screen.Receive, Screen.Settings)
         } else recordingId?.let { done ->
             recordingId = null
             stack = listOf(Screen.Meetings, Screen.Meeting(done))
-            if (recording.error == null) {
-                val p = app.vault.preferences()
-                val ready = localNotesReady(runCatching { app.vault.load(done).language }.getOrDefault(p.language), p.engine, app.nano.value,
-                    app.models.installed(p.summaryModel)) && speechReady(app, p)
-                if (ready) scope.launch { engine.run(done) }
-            }
         }
     }
 

@@ -10,7 +10,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.Base64
 import java.util.UUID
-import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 
 object NativeEngine {
     init {System.loadLibrary("cf_native")}
@@ -39,11 +39,18 @@ class AudioReader(private val vault: Vault,private val id: String): AutoCloseabl
     }
     override fun close() {key.fill(0)}
 }
+
+/** Reasons that stop the notes for now but keep everything done so far: the meeting continues later by itself. */
+val PAUSES=setOf("paused_for_recording","thermal_pause","memory_pause")
+
 class Processing(private val app: ProApp) {
-    private val cancel=AtomicBoolean(false)
-    fun cancel() {cancel.set(true);NativeEngine.cancel()}
+    /** Why the current run should stop: "cancelled" (the person stopped it) or one of [PAUSES]. */
+    private val stop=AtomicReference<String?>(null)
+    fun cancel() {stop.set("cancelled");NativeEngine.cancel()}
+    /** A new recording starts: the microphone gets the phone to itself; finished windows are kept and the notes continue afterwards. */
+    fun pauseForRecording() {if(app.processing.value!=null){stop.set("paused_for_recording");NativeEngine.cancel()}}
     private fun check() {
-        if(cancel.get())error("cancelled")
+        stop.get()?.let {error(it)}
         val power=app.getSystemService(PowerManager::class.java)
         if(power.currentThermalStatus>=PowerManager.THERMAL_STATUS_SEVERE)error("thermal_pause")
         val info=ActivityManager.MemoryInfo();app.getSystemService(ActivityManager::class.java).getMemoryInfo(info)
@@ -51,10 +58,14 @@ class Processing(private val app: ProApp) {
     }
     suspend fun run(id: String) = withContext(Dispatchers.Default) {
         if(app.recording.value.sessionId!=null || app.preparedRecording!=null || !app.processing.compareAndSet(null,id))return@withContext
-        cancel.set(false);NativeEngine.reset()
+        stop.set(null);NativeEngine.reset()
+        // Overall progress: speech to text, then speakers, then notes. Each share comes from real work done.
+        fun progress(share: Float) {app.progress.value=id to share.coerceIn(0f,1f)}
+        progress(0f)
         var stage="asr";var reason: String?=null
         try {
             var s=app.vault.load(id);require(!s.received && s.audioRetained)
+            progress(s.donePercent()/100f)   // a resumed meeting starts from what is already saved
             val pref=app.vault.preferences()
             AudioReader(app.vault,id).use {audio ->
                 if(s.stages["asr"]?.state!="done") {
@@ -77,7 +88,7 @@ class Processing(private val app: ProApp) {
                         val count=(start/30000+1).toInt()
                         s=app.vault.update(id) {old -> old.copy(transcript=(old.transcript.filterNot {p->segments.any {it.id==p.id}}+segments).sortedBy {it.startMs},
                             stages=old.stages+("asr" to Stage("running",count,spec.sha256)))}
-                        start+=30000;app.changed()
+                        start+=30000;progress(SPEECH_SHARE*minOf(1f,start.toFloat()/s.durationMs.coerceAtLeast(1)));app.changed()
                     }
                     s=app.vault.update(id) {it.copy(stages=it.stages+("asr" to it.stages.getValue("asr").copy(state="done")))}
                 }
@@ -96,7 +107,7 @@ class Processing(private val app: ProApp) {
                             try {
                                 // sherpa finds this through JNI as invoke(IIJ)Ljava/lang/Integer;. Only a real lambda
                                 // class has that method: a plain Kotlin 2 lambda (invokedynamic) aborts the process.
-                                val turns=diarizer.processWithCallback(samples,@JvmSerializableLambda {_,_,_->if(cancel.get())1 else 0})
+                                val turns=diarizer.processWithCallback(samples,@JvmSerializableLambda {_,_,_->if(stop.get()!=null)1 else 0})
                                 check()
                                 val vectors=s.speakerVectors.toMutableMap();val labels=mutableMapOf<Int,String>()
                                 turns.groupBy {it.speaker}.forEach {(speaker,parts) ->
@@ -123,7 +134,7 @@ class Processing(private val app: ProApp) {
                                         line.copy(speaker=possible.singleOrNull(),uncertain=line.uncertain || possible.size!=1)
                                     }},stages=old.stages+(stage to Stage("running",(windowStart/60000+1).toInt(),app.models.entry("titanet-small").sha256)))}
                             } finally {samples.fill(0f)}
-                            start+=60000;app.changed()
+                            start+=60000;progress(SPEECH_SHARE+SPEAKER_SHARE*minOf(1f,start.toFloat()/s.durationMs.coerceAtLeast(1)));app.changed()
                         }
                     } finally {diarizer.release();extractor.release()}
                     val profiles=if(pref.matching)app.vault.profiles().filter {it.enabled && it.modelHash==app.models.entry("titanet-small").sha256}else emptyList()
@@ -131,7 +142,7 @@ class Processing(private val app: ProApp) {
                     s=app.vault.update(id) {it.copy(suggestedProfiles=suggestions,stages=it.stages+(stage to Stage("done",modelHash=app.models.entry("titanet-small").sha256)))}
                 }
             }
-            stage="summary";check()
+            stage="summary";check();progress(SPEECH_SHARE+SPEAKER_SHARE)
             require(s.transcript.isNotEmpty()) {"no_recognized_speech"}
             // Meeting content is sensitive: notes are written on this device. The policy never picks the cloud.
             val memory=ActivityManager.MemoryInfo();app.getSystemService(ActivityManager::class.java).getMemoryInfo(memory)
@@ -145,8 +156,13 @@ class Processing(private val app: ProApp) {
                 NotesEngine.GEMMA_LOCAL -> GemmaNotes(app.models.verifiedFile(pref.summaryModel).path,pref.summaryModel)
                 NotesEngine.CLOUD_REDACTED -> error("cloud_is_never_automatic")
             }
+            // Gemini Nano answers only while the app is on screen (ML Kit Prompt API). In the background the notes wait:
+            // speech and speakers are done, and the notes run as soon as the app is opened (ProApp.resumePending).
+            if(model.engine==NotesEngine.GEMINI_NANO && !app.foreground.value) {
+                app.vault.update(id) {it.copy(state="notes_waiting")};return@withContext
+            }
             app.vault.update(id) {it.copy(state="summarizing")};app.changed()
-            val summary=try {Notes.write(model,s,Policy.chunkChars(model.engine,Hybrid.config),::check)} catch(e: PolicyViolation) {
+            val summary=try {Notes.write(model,s,Policy.chunkChars(model.engine,Hybrid.config),::check) {p -> progress(SPEECH_SHARE+SPEAKER_SHARE+NOTES_SHARE*p)}} catch(e: PolicyViolation) {
                 reason="policy_violation"
                 Audit.add(app.vault,AuditEntry(action="policy_violation",engine=model.engine.id,model=model.modelName,reason=e.message,meeting=Audit.meetingRef(id)))
                 throw e
@@ -157,9 +173,15 @@ class Processing(private val app: ProApp) {
                 stages=it.stages+("summary" to Stage("done",modelHash=if(model.engine==NotesEngine.GEMMA_LOCAL)app.models.entry(pref.summaryModel).sha256 else null)))}
             Audit.add(app.vault,AuditEntry(action="notes",engine=model.engine.id,model=model.modelName,source=Audit.sourceOf(model.engine),
                 calls=model.calls,reason=use.reason+(use.warning?.let {",$it"} ?: ""),meeting=Audit.meetingRef(id)))
-        } catch(_: Exception) {
-            app.vault.update(id) {it.copy(state=if(cancel.get())"cancelled"else "failed",stages=it.stages+(stage to (it.stages[stage]?:Stage()).copy(state="failed",error=if(cancel.get())"cancelled"else reason ?: "stage_failed_retry_or_check_models")))}
-        } finally {app.processing.value=null;app.changed()}
+        } catch(e: Exception) {
+            val why=stop.get() ?: e.message
+            if(e is NanoNotReady) reason="nano_not_ready"
+            // Stage and exception type only: never meeting content.
+            android.util.Log.w("Processing","stage $stage stopped: ${e.javaClass.simpleName}: ${e.message?.take(160)}")
+            // A pause keeps the finished windows and the stage as it was: "queued" meetings continue by themselves.
+            if(why in PAUSES) app.vault.update(id) {it.copy(state="queued")}
+            else app.vault.update(id) {it.copy(state=if(why=="cancelled")"cancelled"else "failed",stages=it.stages+(stage to (it.stages[stage]?:Stage()).copy(state="failed",error=if(why=="cancelled")"cancelled"else reason ?: "stage_failed_retry_or_check_models")))}
+        } finally {app.processing.value=null;app.progress.value=null;app.changed()}
     }
 
     /**

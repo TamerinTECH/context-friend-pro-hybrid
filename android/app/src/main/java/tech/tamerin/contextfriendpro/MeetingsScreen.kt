@@ -71,7 +71,7 @@ import kotlinx.coroutines.withContext
             }
         }
         item {
-            PrimaryButton(ui.t("new_recording"), onNew, enabled = recording.sessionId == null && processing == null, icon = Glyphs.Mic)
+            PrimaryButton(ui.t("new_recording"), onNew, enabled = recording.sessionId == null, icon = Glyphs.Mic)
         }
         if (sessions.isNotEmpty()) {
             item { SectionTitle(ui.t("recent")) }
@@ -99,15 +99,17 @@ import kotlinx.coroutines.withContext
                 Text(ui.title(s), style = MaterialTheme.typography.titleSmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Text(ui.meta(s), style = MaterialTheme.typography.bodyMedium, color = Brand.Muted)
             }
-            PhaseChip(ui, phase)
+            val progress by ui.app.progress.collectAsState()
+            PhaseChip(ui, phase, progress?.takeIf { it.first == s.id }?.second?.let { (it * 100).toInt() } ?: s.donePercent().takeIf { phase == Phase.WAITING })
         }
     }
 }
 
-@Composable fun PhaseChip(ui: Ui, phase: Phase) {
+@Composable fun PhaseChip(ui: Ui, phase: Phase, percent: Int? = null) {
     val (key, colors) = when (phase) {
         Phase.RECORDING -> "chip_recording" to (Brand.ErrorContainer to Brand.Error)
         Phase.PROCESSING -> "chip_processing" to (Brand.PrimaryContainer to Brand.OnPrimaryContainer)
+        Phase.WAITING -> "chip_waiting" to (Brand.SurfaceContainer to Brand.Navy)
         Phase.NOT_PROCESSED -> "chip_not_processed" to (Brand.SurfaceContainer to Brand.Navy)
         Phase.NO_SPEECH -> "chip_no_speech" to (Brand.SurfaceContainer to Brand.Navy)
         Phase.FAILED, Phase.INTERRUPTED -> "chip_attention" to (Brand.ErrorContainer to Brand.Error)
@@ -115,7 +117,7 @@ import kotlinx.coroutines.withContext
         Phase.REVIEWED -> "chip_reviewed" to (Brand.SuccessContainer to Brand.Success)
         Phase.RECEIVED -> "chip_received" to (Brand.PrimaryContainer to Brand.OnPrimaryContainer)
     }
-    StatusChip(ui.t(key), colors.first, colors.second)
+    StatusChip(if ((phase == Phase.PROCESSING || phase == Phase.WAITING) && percent != null) ui.t(key) + " · " + ui.tf("percent", "n" to percent) else ui.t(key), colors.first, colors.second)
 }
 
 // ---- Before you begin ---------------------------------------------------------------------------------------------
@@ -137,6 +139,7 @@ import kotlinx.coroutines.withContext
                 language = spoken, state = "recording", template = template)
             val key = app.vault.create(s)
             app.preparedRecording = s to key
+            app.engine.pauseForRecording()   // notes of an earlier meeting pause and continue after this recording
             withContext(Dispatchers.Main) {
                 ContextCompat.startForegroundService(app, Intent(app, RecordingService::class.java).setAction("start"))
                 onStarted()
@@ -196,17 +199,25 @@ fun languageName(code: String) = when (code) { "de" -> "Deutsch"; "he" -> "עב�
 
 @Composable fun RecordingScreen(ui: Ui, recording: RecordingStatus, sessions: List<Session>, onLeave: () -> Unit) {
     val app = ui.app
+    // The last six seconds of 100 ms levels, and whether each counted as sound.
     val history = remember { mutableStateListOf<Float>() }
+    val sounds = remember { mutableStateListOf<Boolean>() }
     LaunchedEffect(recording.elapsedMs, recording.level) {
-        if (recording.state == "recording") { history.add(recording.level); while (history.size > 60) history.removeAt(0) }
+        if (recording.state == "recording") {
+            history.add(recording.level); sounds.add(recording.sound)
+            while (history.size > 60) history.removeAt(0)
+            while (sounds.size > 60) sounds.removeAt(0)
+        }
     }
     val session = sessions.firstOrNull { it.id == recording.sessionId }
     val paused = recording.state == "paused"
-    val hearing = history.takeLast(15).any { it > 0.02f }
+    val hearing = history.takeLast(30).any { it > LOUD_LEVEL }
+    val quiet = !hearing && sounds.takeLast(30).any { it }
     val message = when {
         recording.sessionId == null -> ui.t("rec_saving")
         paused -> ui.t("rec_paused_note")
         hearing -> ui.t("rec_hearing")
+        quiet -> ui.t("rec_quiet")
         recording.elapsedMs > 5000 -> ui.t("rec_silent")
         else -> ui.t("rec_listening")
     }
@@ -227,6 +238,9 @@ fun languageName(code: String) = when (code) { "de" -> "Deutsch"; "he" -> "עב�
             LevelBars(history, Modifier.fillMaxWidth().height(96.dp).padding(vertical = 12.dp))
             Text(message, color = Brand.RecordingSecondary, style = MaterialTheme.typography.bodyLarge, textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite })
+            // Proof that audio arrives, while speech to text waits for the end of the recording.
+            if (recording.heardMs > 0) Text(ui.tf("rec_heard", "time" to clock(recording.heardMs)), color = Color.White,
+                style = MaterialTheme.typography.titleSmall, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(top = 6.dp))
             Spacer(Modifier.height(16.dp))
             Surface(color = Color.White.copy(alpha = 0.10f), contentColor = Color.White, shape = MaterialTheme.shapes.medium, modifier = Modifier.fillMaxWidth()) {
                 Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {

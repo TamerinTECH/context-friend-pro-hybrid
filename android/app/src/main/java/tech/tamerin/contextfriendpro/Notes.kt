@@ -12,6 +12,8 @@ interface NotesModel {
 
 /** The request is too long for this engine: the caller splits the batch and tries again. */
 class InputTooLong(cause: Throwable? = null) : Exception("input_too_long", cause)
+/** Gemini Nano is reported available but refuses every request on this phone yet. */
+class NanoNotReady(cause: Throwable? = null) : Exception("nano_not_ready", cause)
 
 /**
  * Sourced meeting notes, map-reduced over long meetings, for any [NotesModel].
@@ -20,7 +22,8 @@ class InputTooLong(cause: Throwable? = null) : Exception("input_too_long", cause
 object Notes {
     private val modelJson = Json { ignoreUnknownKeys = true; isLenient = true; coerceInputValues = true; explicitNulls = false }
 
-    suspend fun write(model: NotesModel, session: Session, chunkChars: Int, check: () -> Unit = {}): Summary {
+    /** [progress] gets the share of model calls done (0..1): map calls plus the merge rounds they need. */
+    suspend fun write(model: NotesModel, session: Session, chunkChars: Int, check: () -> Unit = {}, progress: (Float) -> Unit = {}): Summary {
         require(session.transcript.isNotEmpty()) { "no_recognized_speech" }
         val template = MeetingTemplate.of(session.template)
 
@@ -62,8 +65,12 @@ object Notes {
         }
         if (batch.isNotEmpty()) groups += batch.toList()
 
+        fun merges(n: Int): Int = if (n <= 1) 0 else (n + 2) / 3 + merges((n + 2) / 3)
+        val planned = (groups.size + merges(groups.size)).coerceAtLeast(1)
+        var done = 0
+        fun step() { done++; progress((done.toFloat() / planned).coerceAtMost(1f)) }
         // Each map result keeps its source ids. Hierarchical synthesis avoids truncating later sections.
-        var parts = groups.flatMap { generate(it, speakers = true) }
+        var parts = groups.flatMap { generate(it, speakers = true).also { step() } }
         while (parts.size > 1) {
             val before = parts.size
             parts = parts.chunked(3).flatMap { group ->
@@ -77,7 +84,7 @@ object Notes {
                         (p.paragraphs + p.decisions + p.uncertainties).map { row(it.text, it.sources) } +
                             p.actions.map { row(listOfNotNull(it.text, it.owner, it.due).joinToString(" · "), it.sources) }
                     }
-                    generate(lines, speakers = false).map { reduced -> reduced.withSources { mapping.getValue(it) } }
+                    generate(lines, speakers = false).map { reduced -> reduced.withSources { mapping.getValue(it) } }.also { step() }
                 }
             }
             // A round that merges nothing would never end: fail openly, never keep a partial summary.

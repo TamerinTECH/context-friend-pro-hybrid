@@ -38,7 +38,12 @@ android {
         storeFile = file(path); storePassword = localProperties.getProperty("upload.storePassword")
         keyAlias = localProperties.getProperty("upload.keyAlias"); keyPassword = localProperties.getProperty("upload.storePassword")
     } }
-    buildTypes { release { isMinifyEnabled = false; if (upload != null) signingConfig = upload } }
+    buildTypes {
+        release { isMinifyEnabled = false; if (upload != null) signingConfig = upload }
+        // Speech, speakers and Gemma run in native code: unoptimised (-O0) they are several times slower than real time,
+        // so debug builds compile the engines optimised too. Kotlin stays debuggable.
+        debug { externalNativeBuild { cmake { arguments += "-DCMAKE_BUILD_TYPE=Release" } } }
+    }
     packaging { jniLibs { useLegacyPackaging = false }; resources.excludes += "META-INF/AL2.0"; resources.excludes += "META-INF/LGPL2.1" }
     testOptions { unitTests.isReturnDefaultValues = true }
 }

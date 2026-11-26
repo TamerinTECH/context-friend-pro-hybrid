@@ -3,6 +3,34 @@
 Hackathon work for #BuildHybridAI 2026. The first commit is disclosed pre-existing code
 (docs/PRE_EXISTING.md); everything listed here was built during the submission period.
 
+## 2026-11-26
+
+- **Notes in the background.** A new foreground service (`ProcessingService`) makes the notes; it
+  starts as soon as a recording ends, normally or interrupted, and keeps going with the screen off or
+  another app open. Meetings cut off by a killed app continue from their saved progress on the next
+  launch. Gemini Nano answers only while the app is on screen, so a meeting waits for the screen
+  ("notes_waiting") and continues by itself when the app opens.
+- **Percent done** on the meeting screen, in the list chip and in the notification, from real work:
+  speech to text 65 %, speakers 25 %, notes 10 %.
+- **Record while notes are made.** "New recording" stays available; a running notes job pauses for the
+  recording (finished windows are kept, the chip says "Paused · N %") and continues afterwards. Heat and
+  low-memory pauses are resumable too, no longer "failed".
+- **Speed.** Debug builds compiled whisper.cpp, llama.cpp and sherpa at -O0; they are now optimised
+  (-O3), about 3–4× faster than real time for speech to text on the Pixel 11 Pro.
+- **Hearing sound.** The recording screen measured raw linear peaks, so a speaker a metre away looked
+  like silence. The level is now 100 ms RMS in decibels with an adaptive noise floor (`SoundMeter`,
+  4 unit tests): "picking up sound", "sound is coming in, but quietly — move closer", "no sound", and a
+  live "Sound heard: mm:ss" counter.
+- **Recording notification** no longer sorted under "Silent": status bar icon, running timer,
+  Pause/Resume and Finish, a tap returns to the recording screen, shown on the lock screen without the
+  meeting's title; no sound or vibration. A leftover "Creating notes" notification after processing is gone.
+- **Recorder** is sturdier: a larger buffer, a slow write skips one second instead of ending the
+  recording, read errors reopen the microphone up to three times, and interruptions show their reason.
+- **Gemini Nano** tries the ways a phone may accept (preview model with JSON, plain, defaults; then the
+  stable model), warms the model up once, and says "Gemini Nano is not ready on this phone yet" instead
+  of a generic error. Processing failures are logged with stage and error type (never content).
+- New copy in English, German and Hebrew (451 strings per language); 97 unit tests.
+
 ## 2026-11-25
 
 - QR scanner no longer crashes the app when it closes: the camera frame copy checks its bounds and

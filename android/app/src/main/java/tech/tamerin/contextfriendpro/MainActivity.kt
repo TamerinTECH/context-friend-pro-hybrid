@@ -33,7 +33,12 @@ class MainActivity: ComponentActivity() {
         super.onCreate(savedInstanceState);applyScreenCapture(this,runCatching {app.vault.preferences().allowScreenCapture}.getOrDefault(false))
         locked.value=app.vault.preferences().appLock
         setContent {ContextFriendTheme {if(locked.value) LockedScreen {unlockApp()} else ProInterface(app)}}
+        handle(intent)
     }
+    override fun onNewIntent(intent: android.content.Intent) {super.onNewIntent(intent);handle(intent)}
+    private fun handle(intent: android.content.Intent?) {if(intent?.action==OPEN_RECORDING)app.openRecording.value++}
+    /** On screen again: pick up meetings whose notes were interrupted or waited for the app (Gemini Nano needs it on screen). */
+    override fun onStart() {super.onStart();app.resumePending()}
     override fun onStop() {if(runCatching {app.vault.preferences().appLock}.getOrDefault(true) && !unlockInProgress)locked.value=true;super.onStop()}
     private fun unlockApp() {val manager=getSystemService(KeyguardManager::class.java);val intent=manager.createConfirmDeviceCredentialIntent("ContextFriend Pro",null);if(intent!=null){unlockInProgress=true;unlock.launch(intent)}}
 }

@@ -1,6 +1,6 @@
 # Done
 
-Status: **Wednesday 25 November 2026, 17:40 Berlin time.** What is built and checked for the #BuildHybridAI
+Status: **Thursday 26 November 2026, 09:35 Berlin time.** What is built and checked for the #BuildHybridAI
 2026 entry. Open items are in [PENDING.md](PENDING.md). Evidence for every check is in
 [TEST_REPORT.md](TEST_REPORT.md); the history is in [../CHANGELOG.md](../CHANGELOG.md).
 
@@ -72,6 +72,23 @@ Based on the design review in [design/](design/README.md):
 - The ContextFriend logo redrawn as a vector, with every asset generated from one script
   ([brand/](brand/README.md)): adaptive and themed (monochrome) app icon, round icon, notification icon,
   in-app logo, PNGs from 48 to 1024 px, Play icon 512, Play feature graphic, Devpost thumbnail.
+
+## On the Pixel 11 Pro: background notes and recording (26 Nov)
+
+- Notes are made in a background service that starts when a recording ends (normally or interrupted),
+  keeps going with the screen off, and continues after the app was killed from the saved progress.
+  Checked live: the 44-minute meeting picked up again by itself after several reinstalls.
+- Percent done on the meeting screen, the list chip and the notification.
+- "New recording" works while notes are being made: the running notes pause ("Paused · N %") and
+  continue afterwards. Checked live.
+- Native engines optimised in debug builds: speech to text about 3–4× faster than real time on the Pixel.
+- The recording screen shows sound that arrives: decibel level bars, "sound is quiet, move closer", and
+  "Sound heard: mm:ss". Checked live: a podcast from a speakerphone across the desk showed
+  "Sound heard: 05:26".
+- The recording notification is visible (not "Silent"), with a timer, Pause/Resume, Finish and a tap
+  back to the recording.
+- Gemini Nano: the app tries the request variants a phone may accept and names the problem when AICore
+  refuses ("not ready on this phone yet"); failures are logged with stage and error type.
 
 ## Bugs found by checking on the emulator and fixed
 
