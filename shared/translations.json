@@ -450,7 +450,9 @@
     "continue_now": "Continue now",
     "rec_quiet": "Sound is coming in, but quietly. Move the phone closer to the people speaking.",
     "rec_heard": "Sound heard: {time}",
-    "reason_nano_not_ready": "Gemini Nano is not ready on this phone yet: Android is still setting it up. Try again later, or choose the ContextFriend engine in Settings."
+    "reason_nano_not_ready": "Gemini Nano is not ready on this phone yet: Android is still setting it up. Try again later, or choose the ContextFriend engine in Settings.",
+    "home_ready_nano": "Ready offline: notes are written on this phone by Gemini Nano.",
+    "home_ready_gemma": "Ready offline: notes are written on this phone by the ContextFriend engine."
   },
   "de": {
     "app_name": "ContextFriend Pro",
@@ -903,7 +905,9 @@
     "continue_now": "Jetzt fortsetzen",
     "rec_quiet": "Ton kommt an, aber leise. Legen Sie das Handy näher zu den Sprechenden.",
     "rec_heard": "Ton gehört: {time}",
-    "reason_nano_not_ready": "Gemini Nano ist auf diesem Handy noch nicht bereit: Android richtet es noch ein. Versuchen Sie es später erneut oder wählen Sie in den Einstellungen die ContextFriend-Engine."
+    "reason_nano_not_ready": "Gemini Nano ist auf diesem Handy noch nicht bereit: Android richtet es noch ein. Versuchen Sie es später erneut oder wählen Sie in den Einstellungen die ContextFriend-Engine.",
+    "home_ready_nano": "Offline bereit: Gemini Nano schreibt die Notizen auf diesem Handy.",
+    "home_ready_gemma": "Offline bereit: die ContextFriend-Engine schreibt die Notizen auf diesem Handy."
   },
   "he": {
     "app_name": "ContextFriend Pro",
@@ -1356,6 +1360,8 @@
     "continue_now": "להמשיך עכשיו",
     "rec_quiet": "קול נקלט, אבל חלש. קרבו את הטלפון לדוברים.",
     "rec_heard": "קול נקלט: {time}",
-    "reason_nano_not_ready": "Gemini Nano עדיין לא מוכן בטלפון הזה: Android עדיין מגדיר אותו. נסו שוב מאוחר יותר, או בחרו במנוע של ContextFriend בהגדרות."
+    "reason_nano_not_ready": "Gemini Nano עדיין לא מוכן בטלפון הזה: Android עדיין מגדיר אותו. נסו שוב מאוחר יותר, או בחרו במנוע של ContextFriend בהגדרות.",
+    "home_ready_nano": "מוכן ללא אינטרנט: Gemini Nano כותב את הסיכום בטלפון הזה.",
+    "home_ready_gemma": "מוכן ללא אינטרנט: המנוע של ContextFriend כותב את הסיכום בטלפון הזה."
   }
 }

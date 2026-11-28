@@ -64,6 +64,16 @@ import kotlinx.coroutines.withContext
             }
         }
         if (sessions.isEmpty()) item { Hero(ui) }
+        if (ready) item {
+            // Which engine writes the notes here, by the same policy as processing: never a global "on device" claim.
+            val engine = (Policy.chooseOnDevice(pref.language, runCatching { EnginePreference.valueOf(pref.engine) }.getOrDefault(EnginePreference.AUTO),
+                OnDeviceOptions(nano, ui.app.models.installed(pref.summaryModel), gemmaFitsMemory = true)) as? LocalChoice.Use)?.engine
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Glyphs.Shield, null, tint = Brand.Success, modifier = Modifier.size(18.dp))
+                Text(ui.t(if (engine == NotesEngine.GEMMA_LOCAL) "home_ready_gemma" else "home_ready_nano"), style = MaterialTheme.typography.bodyMedium,
+                    color = Brand.Muted, modifier = Modifier.padding(start = 8.dp))
+            }
+        }
         if (!ready) item {
             Panel(color = Brand.WarningContainer, border = Brand.WarningContainer, onClick = onPrepare) {
                 Text(ui.t("prepare_banner_title"), style = MaterialTheme.typography.titleSmall, color = Brand.Warning)

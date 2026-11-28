@@ -150,8 +150,8 @@ class Processing(private val app: ProApp) {
             val preference=runCatching {EnginePreference.valueOf(pref.engine)}.getOrDefault(EnginePreference.AUTO)
             val choice=Policy.chooseOnDevice(s.language,preference,OnDeviceOptions(Hybrid.nanoState(),app.models.installed(pref.summaryModel),gemmaFits))
             if(choice is LocalChoice.Blocked) {reason=choice.reason;error(choice.reason)}
-            val use=choice as LocalChoice.Use
-            val model: NotesModel=when(use.engine) {
+            var use=choice as LocalChoice.Use
+            var model: NotesModel=when(use.engine) {
                 NotesEngine.GEMINI_NANO -> NanoNotes(Hybrid.nanoModelName() ?: "gemini-nano")
                 NotesEngine.GEMMA_LOCAL -> GemmaNotes(app.models.verifiedFile(pref.summaryModel).path,pref.summaryModel)
                 NotesEngine.CLOUD_REDACTED -> error("cloud_is_never_automatic")
@@ -162,7 +162,19 @@ class Processing(private val app: ProApp) {
                 app.vault.update(id) {it.copy(state="notes_waiting")};return@withContext
             }
             app.vault.update(id) {it.copy(state="summarizing")};app.changed()
-            val summary=try {Notes.write(model,s,Policy.chunkChars(model.engine,Hybrid.config),::check) {p -> progress(SPEECH_SHARE+SPEAKER_SHARE+NOTES_SHARE*p)}} catch(e: PolicyViolation) {
+            suspend fun write(m: NotesModel)=Notes.write(m,s,Policy.chunkChars(m.engine,Hybrid.config),::check) {p -> progress(SPEECH_SHARE+SPEAKER_SHARE+NOTES_SHARE*p)}
+            val summary=try {
+                try {write(model).also {if(model.engine==NotesEngine.GEMINI_NANO)app.nano.value=NanoState.AVAILABLE}} catch(e: NanoNotReady) {
+                    // AICore reported Gemini Nano available but refuses it. The screens show it as not usable for now
+                    // (the Get-ready page then offers the ContextFriend engine), and in "automatic" mode the notes are
+                    // written by the ContextFriend engine when it is installed. Still on this phone.
+                    app.nano.value=NanoState.UNAVAILABLE
+                    val fallback=Policy.chooseOnDevice(s.language,preference,OnDeviceOptions(NanoState.UNAVAILABLE,app.models.installed(pref.summaryModel),gemmaFits))
+                    if(preference!=EnginePreference.AUTO || fallback !is LocalChoice.Use) throw e
+                    use=fallback.copy(reason="auto_nano_refused");model=GemmaNotes(app.models.verifiedFile(pref.summaryModel).path,pref.summaryModel)
+                    write(model)
+                }
+            } catch(e: PolicyViolation) {
                 reason="policy_violation"
                 Audit.add(app.vault,AuditEntry(action="policy_violation",engine=model.engine.id,model=model.modelName,reason=e.message,meeting=Audit.meetingRef(id)))
                 throw e

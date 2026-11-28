@@ -95,7 +95,7 @@ fun localNotesReady(language: String, engine: String, nano: NanoState, gemmaInst
 }
 
 /** Failure codes that mean "set up on-device AI first" rather than "try again". */
-val SETUP_FAILURES = setOf("nano_not_downloaded", "nano_downloading", "nano_unavailable", "gemma_missing", "no_on_device_engine",
+val SETUP_FAILURES = setOf("nano_not_downloaded", "nano_downloading", "nano_unavailable", "nano_not_ready", "gemma_missing", "no_on_device_engine",
     "stage_failed_retry_or_check_models", "model_integrity_failed")
 
 /** History before new notes replace the current ones: the current notes stay restorable. */
