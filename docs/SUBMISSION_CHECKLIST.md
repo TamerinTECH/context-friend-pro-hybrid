@@ -11,11 +11,11 @@ Judging 10–16 Dec; the app and the Firebase project stay free and available un
 - [x] Firebase console: Blaze and AI Logic (Agent Platform) are on: billing enabled, `aiplatform` and
       `firebasevertexai` APIs enabled (read back 24 Nov). See FIREBASE_SETUP.md.
 - [ ] Confirm the €10 budget alert exists (the agent cannot read budgets without enabling the Budget API).
-- [ ] Pixel 11 Pro: AICore update + AICore Developer Preview; connect by USB with USB debugging.
-- [ ] Register the App Check debug token from logcat (console → App Check → Manage debug tokens).
-      **Blocks cloud notes:** AI Logic enforces App Check, so unregistered builds get HTTP 401.
-- [ ] Decide judge access: Play Integrity release APK (needs the Play Console ↔ Cloud project link)
-      or another way; see "Judge access" below.
+- [x] Pixel 11 Pro connected; Gemini Nano answers (26 Nov).
+- [x] App Check debug tokens registered for the emulator and the Pixel (delete after testing).
+- [x] Judge access: Play Integrity. Play Console linked to the Cloud project (28 Nov, "Protected with
+      Play → Play Integrity API"); release SHA-256 on the Firebase app; App Check accepts APKs from
+      outside Play on devices that meet device integrity (FIREBASE_SETUP.md §4).
 - [ ] Find two people to read the demo script; record the video (VIDEO_SCRIPT.md); upload to
       YouTube as public with English subtitles.
 - [ ] Review DEVPOST.md, paste it into Devpost, add repo URL, video URL, APK link, platform Android.

@@ -61,10 +61,18 @@ No `google-services.json` and no Google Services Gradle plugin are needed.
   `firebase appcheck:debugtokens:create <token> --project <id> --app <appId>` command. Register it
   that way or under App Check → Apps → your app → **Manage debug tokens**. Never commit or share it,
   and delete it when you are done (`appcheck:debugtokens:delete`).
-- **Release builds** use Play Integrity. Link the Cloud project in Play Console
-  (Release → App integrity → Play Integrity API → Link Cloud project) and register the
-  signing certificate's SHA-256 in App Check. For APKs installed outside Google Play, set
-  `PLAY_RECOGNIZED` and `LICENSED` to not required and the minimum to device integrity.
+- **Release builds** use Play Integrity (set up 28 Nov 2026):
+  1. Play Console → the app → **Protected with Play → Play Integrity API → Link project** (the page moved
+     there from Release → App integrity). Linking accepts the Play Integrity terms. Daily limit 10,000.
+  2. The release signing certificate's SHA-256 on the Firebase Android app:
+     `firebase apps:android:sha:create <appId> <sha256>`. The release key is the Play upload key, so an
+     APK from GitHub carries that certificate.
+  3. App Check Play Integrity settings for APKs installed outside Google Play (API `v1 …/playIntegrityConfig`,
+     or the console): `appIntegrity.allowUnrecognizedVersion = true`, no licence check,
+     `deviceIntegrity.minDeviceRecognitionLevel = MEETS_DEVICE_INTEGRITY`. Emulators and rooted phones are
+     refused; on-device features never need App Check.
+  - Cost guard: any real phone with the APK can use the cloud notes. The €10 budget alert and the Remote
+    Config switch `cloud_enabled` limit that.
 - Enforce App Check for **Firebase AI Logic** and **Cloud Firestore**.
 
 ## 5. Authentication
