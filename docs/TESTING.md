@@ -1,7 +1,8 @@
 # Testing instructions
 
-> **Draft, 22 Nov 2026.** Steps marked *(phone check pending)* are implemented and unit-tested but
-> not yet run on a Gemini Nano phone. They are confirmed or corrected before submission.
+> **28 Nov 2026.** The Gemini Nano path, background notes and recording were checked on a Pixel 11 Pro
+> (docs/TEST_REPORT.md). Steps still marked *(phone check pending)* are implemented and unit-tested and
+> are checked on the release build before the submission.
 
 For judges and anyone trying ContextFriend Pro Hybrid. No account, login or personal data is
 needed. Use only the fictional demo meeting in [demo/parent-teacher-conference.md](demo/parent-teacher-conference.md)
@@ -25,8 +26,14 @@ or your own test speech, never a real meeting.
 
 ## Install
 
-*(The first release is published before submission.)* Download the APK from the repository's [Releases](https://github.com/TamerinTECH/context-friend-pro-hybrid/releases)
-and install it (allow installs from your browser or file manager). The app is free.
+1. On the phone, open the [landing page](https://tamerintech.github.io/context-friend-pro-hybrid/) and tap **Download for Android**, or download
+   `ContextFriendPro.apk` from the [latest release](https://github.com/TamerinTECH/context-friend-pro-hybrid/releases/latest). Open it and allow your browser to install
+   apps. The app is free, without account or ads.
+2. Start ContextFriend Pro: a short introduction (three steps) ends in **Get this phone ready**, which
+   downloads speech to text and speaker separation (120 MB, use Wi-Fi). The **Local AI guide** in the
+   introduction and under Settings explains Gemini Nano and the ContextFriend engine.
+3. Cloud notes need a real phone with internet: App Check checks the app with Play Integrity, so
+   emulators and modified phones are refused. Everything on the phone works without it.
 
 ## A five-minute tour
 
@@ -43,7 +50,7 @@ The app has three tabs at the bottom: **Meetings**, **Receive** and **Settings**
 3. Notes start by themselves, on the phone: **Creating your notes** shows the real steps (speech
    to text, speakers, notes). The label under the title says where the notes were made, for
    example **Created on this phone · Gemini Nano**. It comes from the `inferenceSource` Firebase AI
-   Logic reports for every request, not from an assumption. *(Gemini Nano path: phone check pending)*
+   Logic reports for every request, not from an assumption. *(checked on a Pixel 11 Pro, 26 Nov)*
    A recording without speech ends as **No speech detected**, never as an empty summary.
 4. **Turn on airplane mode** and use **⋮ → Create notes again**: the on-device path keeps working.
    *(phone check pending)*
@@ -65,8 +72,8 @@ The app has three tabs at the bottom: **Meetings**, **Receive** and **Settings**
 
 - No Gemini Nano: the app writes notes with the ContextFriend engine (Gemma 4) on the phone and
   says so in the label under the title. It never falls back to the cloud on its own.
-- The cloud and cloud links work on any phone with internet, always after **Review what you send**
-  or the share screen.
+- The cloud and cloud links work on real phones with internet (App Check with Play Integrity;
+  emulators are refused), always after **Review what you send** or the share screen.
 
 ## Automated tests
 

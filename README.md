@@ -11,12 +11,12 @@ all on the phone. The notes come from **Gemini Nano through Firebase AI Logic** 
 the teacher asks for it: names are replaced on the phone first, the teacher sees the exact text that
 would be sent, and the answer is put back together on the phone.
 
-> **#BuildHybridAI 2026 entry, work in progress (25 Nov 2026).** The native recorder in the first
-> commit is disclosed pre-existing work ([docs/PRE_EXISTING.md](docs/PRE_EXISTING.md)); everything
-> after it was built during the submission period ([CHANGELOG.md](CHANGELOG.md)). Gemini Nano, cloud
-> and link features are implemented and unit-tested; the phone checks are tracked in
-> [docs/SUBMISSION_CHECKLIST.md](docs/SUBMISSION_CHECKLIST.md) and reported in
-> [docs/TEST_REPORT.md](docs/TEST_REPORT.md).
+> **#BuildHybridAI 2026 entry.** Try it: **[landing page](https://tamerintech.github.io/context-friend-pro-hybrid/)** · **[APK](https://github.com/TamerinTECH/context-friend-pro-hybrid/releases/latest)**
+> (Android 12+, free, no account). The native recorder in the first commit is disclosed pre-existing
+> work ([docs/PRE_EXISTING.md](docs/PRE_EXISTING.md)); everything after it was built during the
+> submission period ([CHANGELOG.md](CHANGELOG.md)). Phone checks on a Pixel 11 Pro are reported in
+> [docs/TEST_REPORT.md](docs/TEST_REPORT.md); what is left before the submission is in
+> [docs/NEXT_STEPS.md](docs/NEXT_STEPS.md).
 
 ## Screens
 
@@ -88,7 +88,8 @@ time; this is not a legal certification of anonymity, and the app makes no medic
 
 - [Testing instructions](docs/TESTING.md) (devices, Gemini Nano 4 setup, a five-minute tour)
 - [Fictional demo meeting script](docs/demo/parent-teacher-conference.md)
-- APK: published under Releases before submission.
+- [Landing page](https://tamerintech.github.io/context-friend-pro-hybrid/) with install steps and the local AI guide
+- APK: [latest release](https://github.com/TamerinTECH/context-friend-pro-hybrid/releases/latest) (signed; checksums on the release page)
 
 ## Build
 

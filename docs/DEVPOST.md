@@ -90,7 +90,9 @@ Code: `android/app/src/main/java/tech/tamerin/contextfriendpro/` — `Hybrid.kt`
 ## Accomplishments
 
 - A hybrid design where "hybrid" means the user controls the boundary, and the code proves it with tests.
-- Real on-device speech, speakers and notes on a phone, ⚠ measured on a Pixel 11 Pro.
+- Real on-device speech, speakers and notes on a phone, measured on a Pixel 11 Pro: speech to text about
+  3–4× faster than real time, and Gemini Nano 4 notes for a 12-minute recording in five on-device requests,
+  in the background while the phone is locked.
 
 ## What we learned
 
@@ -114,5 +116,8 @@ encrypted Firestore links, CI and all tests. See `docs/PRE_EXISTING.md` and `CHA
 
 ## Try it
 
-APK, testing instructions and a fictional demo script: see the repository README and
-`docs/TESTING.md`. Free, no account needed.
+- Landing page with install steps: https://tamerintech.github.io/context-friend-pro-hybrid/
+- APK (signed, Android 12+): https://github.com/TamerinTECH/context-friend-pro-hybrid/releases/latest
+- Testing instructions and a fictional demo script: `docs/TESTING.md` and `docs/demo/` in the repository.
+
+Free, no account needed. Cloud notes work on real phones (App Check with Play Integrity).

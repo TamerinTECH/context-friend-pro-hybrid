@@ -1,6 +1,6 @@
 # Done
 
-Status: **Thursday 26 November 2026, 09:35 Berlin time.** What is built and checked for the #BuildHybridAI
+Status: **Saturday 28 November 2026, 13:30 Berlin time.** What is built and checked for the #BuildHybridAI
 2026 entry. Open items are in [PENDING.md](PENDING.md). Evidence for every check is in
 [TEST_REPORT.md](TEST_REPORT.md); the history is in [../CHANGELOG.md](../CHANGELOG.md).
 
@@ -72,6 +72,17 @@ Based on the design review in [design/](design/README.md):
 - The ContextFriend logo redrawn as a vector, with every asset generated from one script
   ([brand/](brand/README.md)): adaptive and themed (monochrome) app icon, round icon, notification icon,
   in-app logo, PNGs from 48 to 1024 px, Play icon 512, Play feature graphic, Devpost thumbnail.
+
+## Release, judge access and first-run experience (28 Nov)
+
+- Play Integrity for App Check: Play Console linked to the Cloud project, release SHA-256 on the Firebase
+  app, App Check accepts APKs from outside Play on devices that meet device integrity (read back).
+- Release 1.0.0 candidate 1 on GitHub: signed with the upload key, checksums; checked that the release APK
+  carries the Play Integrity provider and no debug provider.
+- Landing page live: https://tamerintech.github.io/context-friend-pro-hybrid/ (GitHub Pages workflow).
+- Animated splash, three-step first-launch introduction, Local AI guide, readiness line on Meetings, the
+  ContextFriend engine when Gemini Nano refuses. Compiled and unit-tested; to be seen on the phone in the
+  device test.
 
 ## On the Pixel 11 Pro: background notes and recording (26 Nov)
 

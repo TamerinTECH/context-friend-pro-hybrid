@@ -3,6 +3,23 @@
 Hackathon work for #BuildHybridAI 2026. The first commit is disclosed pre-existing code
 (docs/PRE_EXISTING.md); everything listed here was built during the submission period.
 
+## 2026-11-28
+
+- **Judge access:** Play Integrity for App Check. The Play Console app is linked to the Cloud project, the
+  release certificate is registered on the Firebase app, and App Check accepts APKs installed from outside
+  Google Play on devices that meet device integrity (FIREBASE_SETUP.md §4).
+- **Release 1.0.0 candidate 1** on GitHub with checksums, signed with the upload key.
+- **Landing page** on GitHub Pages (`site/`), deployed by a workflow: download, how it works, the hybrid
+  table, install steps, local AI guide. No external fonts, scripts, cookies or tracking.
+- **Animated splash** (Android 12+ splash API): the logo pops in, its sound bars move, the eyes blink.
+- **First-launch introduction** in three steps, ending in one-tap "Get this phone ready" with the real
+  state of speech, speakers and notes.
+- **Local AI guide**: how to turn on Gemini Nano, with buttons to the Play Store and developer options,
+  and the ContextFriend engine for phones without it.
+- When Gemini Nano refuses, automatic mode writes the notes with the ContextFriend engine if it is
+  installed; Meetings says which on-device engine is ready.
+- docs/NEXT_STEPS.md: the timeline to the submission and the device test script.
+
 ## 2026-11-26
 
 - **Notes in the background.** A new foreground service (`ProcessingService`) makes the notes; it

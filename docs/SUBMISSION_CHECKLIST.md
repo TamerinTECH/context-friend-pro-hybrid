@@ -43,7 +43,8 @@ Judging 10–16 Dec; the app and the Firebase project stay free and available un
   - [x] Remote Config kill switch → local-only mode (emulator, 24 Nov).
   - [~] Encrypted link: created and opened on the emulator (24 Nov; again through the new Share and Receive
         screens 25 Nov); phone ↔ emulator still to do.
-- [ ] Release APK signed, published as a GitHub Release with checksums.
+- [x] Release APK signed, published as a GitHub Release with checksums (1.0.0 candidate 1, 28 Nov).
+- [x] Landing page on GitHub Pages (28 Nov): https://tamerintech.github.io/context-friend-pro-hybrid/
 - [ ] README and TESTING.md: remove "(phone check pending)" markers or correct the claims.
 - [ ] Final scan: `git log -p` for keys, tokens, real names; no personal data anywhere.
 

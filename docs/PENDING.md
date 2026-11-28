@@ -1,6 +1,6 @@
 # Pending
 
-Status: **Thursday 26 November 2026, 09:35 Berlin time.** Deadline: **Monday 30 November, 23:00 Berlin**
+Status: **Saturday 28 November 2026, 13:30 Berlin time.** The day-by-day plan and the device test script are in **[NEXT_STEPS.md](NEXT_STEPS.md)**. Deadline: **Monday 30 November, 23:00 Berlin**
 (internal target 18:00). Judging 10–16 December; the app and the Firebase project stay available until
 16 December. What is finished is in [DONE.md](DONE.md).
 
@@ -11,9 +11,8 @@ Status: **Thursday 26 November 2026, 09:35 Berlin time.** Deadline: **Monday 30 
 3. **`gcloud auth login`** again: Google asks for reauthentication, so the agent cannot read back the
    Firestore TTL state.
 4. **Confirm the €10 budget alert** exists on the billing account.
-5. **Judge access:** decide on a Play Integrity release (link the Cloud project in Play Console, register
-   the release SHA-256 in App Check) or the fallback (judges see the on-device features; the video shows
-   the cloud path). See [SUBMISSION_CHECKLIST.md](SUBMISSION_CHECKLIST.md).
+5. ~~Judge access~~ done 28 Nov: Play Integrity (Play Console linked, release SHA-256 registered, App Check
+   accepts APKs from outside Play on real phones).
 6. **Logo:** confirm the vector redraw in [brand/](brand/README.md), or send the original SVG or AI file
    and I swap it in.
 7. **Review the redesign screenshots** (`D:\work\TamerinTECH\screenshots\contextfriend-pro-redesign-2026-11-25\`).
@@ -37,7 +36,8 @@ Status: **Thursday 26 November 2026, 09:35 Berlin time.** Deadline: **Monday 30 
 
 ## Agent, release and submission
 
-- Signed release APK as a GitHub Release with checksums.
+- ~~Signed release APK as a GitHub Release with checksums~~ 1.0.0 candidate 1 published 28 Nov; final after the device test.
+- ~~Landing page~~ live on GitHub Pages 28 Nov.
 - Read back the Firestore TTL as ACTIVE; decide App Check enforcement for Firestore.
 - Final scan of the history for keys, tokens and real names.
 
