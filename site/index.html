@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ContextFriend Pro</title>
+<meta name="description" content="Meeting notes for teachers, where the conversation never has to leave the phone. Gemini Nano on the device, the cloud only when you ask.">
+<meta property="og:title" content="ContextFriend Pro">
+<meta property="og:description" content="Meeting notes for teachers, where the conversation never has to leave the phone.">
+<meta property="og:image" content="assets/og-image.png">
+<link rel="icon" href="assets/icon-192.png">
+<style>
+  :root {
+    --primary: #245FD6; --primary-soft: #EAF1FF; --navy: #162E51; --accent: #F6C453;
+    --muted: #5F6E83; --bg: #F7F8FA; --surface: #FFFFFF; --line: #E3E8F0; --ok: #1E7F4F; --ok-soft: #E6F4EC;
+    --radius: 20px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--navy); font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  a { color: var(--primary); }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+  header { position: sticky; top: 0; z-index: 10; background: rgba(247, 248, 250, .92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+  header .wrap { display: flex; align-items: center; gap: 12px; height: 64px; }
+  header img { width: 34px; height: 34px; }
+  header strong { font-size: 18px; }
+  header nav { margin-left: auto; display: flex; gap: 18px; font-size: 15px; }
+  header nav a { color: var(--navy); text-decoration: none; }
+  header nav a:hover { color: var(--primary); }
+  @media (max-width: 720px) { header nav .optional { display: none; } }
+
+  .hero { padding: 64px 0 40px; display: grid; grid-template-columns: 1.15fr .85fr; gap: 40px; align-items: center; }
+  @media (max-width: 860px) { .hero { grid-template-columns: 1fr; padding-top: 40px; } }
+  .eyebrow { display: inline-block; font-size: 14px; font-weight: 600; color: var(--primary); background: var(--primary-soft); padding: 6px 12px; border-radius: 999px; }
+  h1 { font-size: clamp(32px, 5vw, 52px); line-height: 1.12; margin: 18px 0 16px; letter-spacing: -.01em; }
+  .lead { font-size: 19px; color: var(--muted); max-width: 36em; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+  .btn { display: inline-flex; align-items: center; gap: 10px; padding: 14px 22px; border-radius: 16px; font-weight: 600; text-decoration: none; font-size: 16px; }
+  .btn.primary { background: var(--primary); color: #fff; }
+  .btn.primary:hover { background: #1c4fb5; }
+  .btn.secondary { border: 1.5px solid var(--primary); color: var(--primary); background: var(--surface); }
+  .small { font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .phones { position: relative; height: 520px; }
+  .phone { position: absolute; width: 230px; border-radius: 34px; padding: 9px; background: #10213B; box-shadow: 0 30px 60px -20px rgba(22, 46, 81, .45); }
+  .phone img { display: block; width: 100%; border-radius: 26px; }
+  .phone.back { right: 10px; top: 0; transform: rotate(6deg); }
+  .phone.front { left: 10px; top: 40px; transform: rotate(-4deg); animation: float 6s ease-in-out infinite; }
+  @keyframes float { 50% { transform: rotate(-4deg) translateY(-10px); } }
+  @media (max-width: 860px) { .phones { height: 470px; max-width: 460px; margin: 0 auto; } .phone { width: 200px; } }
+  @media (max-width: 560px) { .phones { height: 450px; } .phone.back { display: none; } .phone.front { left: calc(50% - 100px); top: 10px; } }
+  @media (prefers-reduced-motion: reduce) { .phone.front { animation: none; } html { scroll-behavior: auto; } }
+
+  section { padding: 56px 0; }
+  h2 { font-size: clamp(26px, 3.4vw, 36px); line-height: 1.2; margin: 0 0 12px; }
+  .intro { color: var(--muted); max-width: 44em; margin: 0 0 28px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  @media (max-width: 860px) { .grid3 { grid-template-columns: 1fr; } }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
+  .card h3 { margin: 12px 0 6px; font-size: 19px; }
+  .card p { margin: 0; color: var(--muted); font-size: 16px; }
+  .num { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; background: var(--primary-soft); color: var(--primary); }
+
+  .table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; font-size: 16px; }
+  .table th, .table td { text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .table th { background: var(--primary-soft); font-size: 14px; text-transform: uppercase; letter-spacing: .04em; color: var(--navy); }
+  .table tr:last-child td { border-bottom: 0; }
+  .tag { display: inline-block; font-size: 13px; font-weight: 600; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+  .tag.device { background: var(--ok-soft); color: var(--ok); }
+  .tag.cloud { background: #FFF5DD; color: #8A5A00; }
+  .scroll { overflow-x: auto; }
+
+  .shots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  @media (max-width: 860px) { .shots { grid-template-columns: repeat(2, 1fr); } }
+  .shots figure { margin: 0; }
+  .shots img { width: 100%; border-radius: 22px; border: 1px solid var(--line); box-shadow: 0 16px 30px -18px rgba(22, 46, 81, .35); }
+  .shots figcaption { font-size: 15px; color: var(--muted); margin-top: 8px; text-align: center; }
+
+  .steps { counter-reset: s; list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+  .steps li { counter-increment: s; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px 16px 62px; position: relative; }
+  .steps li::before { content: counter(s); position: absolute; left: 16px; top: 14px; width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: #fff; display: grid; place-items: center; font-weight: 700; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  @media (max-width: 860px) { .two { grid-template-columns: 1fr; } }
+  .note { background: var(--primary-soft); border-radius: 16px; padding: 16px 18px; color: var(--navy); font-size: 16px; }
+  ul.checks { padding: 0; list-style: none; margin: 0; display: grid; gap: 10px; }
+  ul.checks li { padding-left: 30px; position: relative; }
+  ul.checks li::before { content: "✓"; position: absolute; left: 0; top: 0; color: var(--ok); font-weight: 700; }
+
+  .band { background: var(--navy); color: #fff; border-radius: 28px; padding: 40px; display: flex; flex-wrap: wrap; gap: 24px; align-items: center; justify-content: space-between; }
+  .band p { margin: 6px 0 0; color: #C9D6EA; }
+  .band .btn.primary { background: var(--accent); color: var(--navy); }
+  footer { padding: 36px 0 48px; color: var(--muted); font-size: 15px; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: space-between; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <img src="assets/logo.svg" alt="">
+    <strong>ContextFriend Pro</strong>
+    <nav>
+      <a class="optional" href="#how">How it works</a>
+      <a class="optional" href="#hybrid">Hybrid</a>
+      <a href="#install">Install</a>
+      <a href="https://github.com/TamerinTECH/context-friend-pro-hybrid">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <div>
+      <span class="eyebrow">#BuildHybridAI 2026 · Android</span>
+      <h1>Meeting notes for teachers, where the conversation never has to leave the phone.</h1>
+      <p class="lead">ContextFriend Pro records a parent–teacher conference or a support-plan meeting, turns speech into text,
+        tells the speakers apart and writes notes you can check, all on the phone. Every point links to the moment it was said.
+        The cloud is used only when you ask for it, and you see exactly what would be sent first.</p>
+      <div class="actions">
+        <a class="btn primary" href="https://github.com/TamerinTECH/context-friend-pro-hybrid/releases/latest/download/ContextFriendPro.apk">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          Download for Android</a>
+        <a class="btn secondary hidden" id="video" href="#">Watch the demo</a>
+        <a class="btn secondary" href="#install">How to install</a>
+      </div>
+      <p class="small">Free APK for Android 12 or newer · no account · no ads · no tracking</p>
+    </div>
+    <div class="phones" aria-hidden="true">
+      <div class="phone back"><img src="assets/1-meetings.png" alt=""></div>
+      <div class="phone front"><img src="assets/4-summary.png" alt=""></div>
+    </div>
+  </div>
+
+  <section id="how">
+    <div class="wrap">
+      <h2>Three steps, no setup maze</h2>
+      <p class="intro">Install, tap "Get this phone ready" once on Wi-Fi, and everything after that works in airplane mode.</p>
+      <div class="grid3">
+        <div class="card"><div class="num">1</div><h3>Record</h3><p>Tell everyone it is recorded, tap record, put the phone on the table. The level bars and "Sound heard" show that it is listening.</p></div>
+        <div class="card"><div class="num">2</div><h3>Notes on the phone</h3><p>Speech to text, speakers and notes run in the background on the phone, with a percentage. You can lock the screen or open another app.</p></div>
+        <div class="card"><div class="num">3</div><h3>Check and share</h3><p>Each point has its sources in the transcript. Mark the notes as reviewed, then share them as text or as an encrypted link.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>What it looks like</h2>
+      <div class="shots">
+        <figure><img src="assets/1-meetings.png" alt="List of meetings with their state" loading="lazy"><figcaption>Your conversations</figcaption></figure>
+        <figure><img src="assets/2-recording.png" alt="Full-screen recording with level bars" loading="lazy"><figcaption>Recording</figcaption></figure>
+        <figure><img src="assets/4-summary.png" alt="Summary where every point has sources" loading="lazy"><figcaption>Notes with sources</figcaption></figure>
+        <figure><img src="assets/5-review-what-you-send.png" alt="Review of the exact text before a cloud request, names replaced" loading="lazy"><figcaption>Review what you send</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="hybrid">
+    <div class="wrap">
+      <h2>Hybrid, the other way round</h2>
+      <p class="intro">Teachers in Germany may not paste conversations about children into a cloud chatbot. So here the device is the
+        default, and the step to the cloud is deliberate, inspected and consented, one meeting at a time.</p>
+      <div class="scroll">
+        <table class="table">
+          <thead><tr><th>Step</th><th>Where</th><th>How</th></tr></thead>
+          <tbody>
+            <tr><td>Speech to text</td><td><span class="tag device">On the phone</span></td><td>whisper.cpp, in 30-second windows; about 3–4× faster than real time on a Pixel 11 Pro</td></tr>
+            <tr><td>Who said what</td><td><span class="tag device">On the phone</span></td><td>Speaker separation (pyannote, TitaNet) in one-minute windows</td></tr>
+            <tr><td>Notes</td><td><span class="tag device">On the phone</span></td><td><b>Gemini Nano through Firebase AI Logic</b> (<code>ONLY_ON_DEVICE</code>), or the ContextFriend engine (Gemma 4) on phones without Gemini Nano and for German and Hebrew</td></tr>
+            <tr><td>Better notes, if you ask</td><td><span class="tag cloud">Cloud, on request</span></td><td>Gemini through Firebase AI Logic in the EU. Names are replaced on the phone first, you see the exact text, the answer is put back together on the phone. App Check (Play Integrity) protects the endpoint.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="install">
+    <div class="wrap two">
+      <div>
+        <h2>Install</h2>
+        <ol class="steps">
+          <li><b>Download</b> <a href="https://github.com/TamerinTECH/context-friend-pro-hybrid/releases/latest/download/ContextFriendPro.apk">ContextFriendPro.apk</a> on the phone (checksums on the <a href="https://github.com/TamerinTECH/context-friend-pro-hybrid/releases/latest">release page</a>).</li>
+          <li><b>Open it</b> and allow your browser to install apps when Android asks.</li>
+          <li><b>Start ContextFriend Pro</b>, go through the three short welcome steps and tap <b>Get this phone ready</b> on Wi-Fi: 120 MB for speech and speakers.</li>
+          <li><b>Record</b> a conversation and watch the notes appear, with the percentage, in the list.</li>
+        </ol>
+        <p class="small">Needs Android 12 or newer. The cloud option needs a real phone (not an emulator) and the internet; everything else works offline.</p>
+      </div>
+      <div>
+        <h2>Local AI on your phone</h2>
+        <p class="intro" style="margin-bottom:16px">The notes come from Gemini Nano when your phone has it. The app's Local AI guide walks you through it:</p>
+        <ul class="checks">
+          <li>Recent flagship phones have Gemini Nano built in, for example the Pixel 9, 10 and 11 families.</li>
+          <li>Update <b>Android AICore</b> in the Play Store.</li>
+          <li>Pixel 10 and 11 (Gemini Nano 4): Developer options → AICore Settings → <b>Enable AICore Developer Preview</b>.</li>
+          <li>Stay on Wi-Fi for a few minutes while Android downloads the model.</li>
+        </ul>
+        <div class="note" style="margin-top:16px"><b>No Gemini Nano?</b> The ContextFriend engine (Gemma 4) writes the notes instead, on phones with at least 6 GB of memory. It is one 3.35 GB download.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Private by design</h2>
+      <div class="grid3">
+        <div class="card"><h3>Encrypted on the phone</h3><p>Recordings, transcripts and notes are stored encrypted. Screenshots are blocked unless you allow them; an app lock is one switch away.</p></div>
+        <div class="card"><h3>A log of every AI step</h3><p>Privacy activity shows where each step ran (this phone or the cloud), which model and how many requests. Never what was said.</p></div>
+        <div class="card"><h3>Open source</h3><p>Apache-2.0. The policy that keeps meeting content on the phone is plain code with unit tests, in the repository.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="band">
+        <div>
+          <h2 style="margin:0">Try it on your phone</h2>
+          <p>Free, no account. Built by TamerinTECH GmbH for #BuildHybridAI 2026.</p>
+        </div>
+        <a class="btn primary" href="https://github.com/TamerinTECH/context-friend-pro-hybrid/releases/latest/download/ContextFriendPro.apk">Download for Android</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 TamerinTECH GmbH · Apache-2.0</span>
+    <span><a href="https://github.com/TamerinTECH/context-friend-pro-hybrid">Source code</a> ·
+      <a href="https://github.com/TamerinTECH/context-friend-pro-hybrid/blob/main/docs/PRIVACY_AND_THREAT_MODEL.md">Privacy and threat model</a> ·
+      <a id="imprint" href="https://www.tamerintech.com">Impressum</a></span>
+  </div>
+</footer>
+
+<script>
+  // The demo video link appears once it is set (YouTube URL after the upload).
+  const VIDEO_URL = "";
+  if (VIDEO_URL) { const v = document.getElementById("video"); v.href = VIDEO_URL; v.classList.remove("hidden"); }
+</script>
+</body>
+</html>
