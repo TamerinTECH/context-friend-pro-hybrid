@@ -62,7 +62,9 @@ fun validId(s: String): Boolean = runCatching { UUID.fromString(s).toString() ==
     /** Names to protect (for example a class roster). Local only; used by the redaction before any cloud request. */
     val people: List<String> = emptyList(),
     /** Off by default (FLAG_SECURE). On lets the user share the screen or record a demo. */
-    val allowScreenCapture: Boolean = false)
+    val allowScreenCapture: Boolean = false,
+    /** The first-launch introduction was shown (Welcome.kt). */
+    val onboarded: Boolean = false)
 
 fun cosine(a: List<Float>, b: List<Float>): Float {
     if(a.size != b.size || a.isEmpty()) return -1f

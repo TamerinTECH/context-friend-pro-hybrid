@@ -31,6 +31,16 @@ class MainActivity: ComponentActivity() {
         enableEdgeToEdge(statusBarStyle=SystemBarStyle.light(AndroidColor.TRANSPARENT,AndroidColor.TRANSPARENT),
             navigationBarStyle=SystemBarStyle.light(AndroidColor.TRANSPARENT,AndroidColor.TRANSPARENT))
         super.onCreate(savedInstanceState);applyScreenCapture(this,runCatching {app.vault.preferences().allowScreenCapture}.getOrDefault(false))
+        // Splash (themes.xml, drawable/splash_icon_animated.xml): let the icon finish its animation, then the badge grows
+        // and fades into the app. Only on a cold start, so it never slows down returning to the app.
+        splashScreen.setOnExitAnimationListener {view ->
+            val ends=(view.iconAnimationStart?.toEpochMilli() ?: 0L)+(view.iconAnimationDuration?.toMillis() ?: 0L)
+            view.postDelayed({
+                view.iconView?.animate()?.scaleX(1.35f)?.scaleY(1.35f)?.alpha(0f)?.setDuration(300)
+                    ?.setInterpolator(android.view.animation.AccelerateInterpolator())?.start()
+                view.animate().alpha(0f).setStartDelay(100).setDuration(260).withEndAction {view.remove()}.start()
+            },(ends-System.currentTimeMillis()).coerceIn(0L,700L))
+        }
         locked.value=app.vault.preferences().appLock
         setContent {ContextFriendTheme {if(locked.value) LockedScreen {unlockApp()} else ProInterface(app)}}
         handle(intent)

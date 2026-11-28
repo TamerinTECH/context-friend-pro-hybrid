@@ -1,5 +1,6 @@
 package tech.tamerin.contextfriendpro
 
+import kotlinx.serialization.encodeToString
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -17,6 +18,8 @@ sealed interface Screen {
     data object Meetings : Screen
     data object Receive : Screen
     data object Settings : Screen
+    /** First launch only: three short steps and "Get this phone ready". */
+    data object Welcome : Screen
     data object Setup : Screen
     data object Recording : Screen
     data class Meeting(val id: String) : Screen
@@ -50,7 +53,7 @@ private val ROOTS = listOf(Screen.Meetings, Screen.Receive, Screen.Settings)
         pref = app.vault.preferences()
     }
 
-    var stack by remember { mutableStateOf(listOf<Screen>(Screen.Meetings)) }
+    var stack by remember { mutableStateOf(listOf<Screen>(if (pref.onboarded) Screen.Meetings else Screen.Welcome)) }
     val screen = stack.last()
     fun go(s: Screen) { stack = if (s in ROOTS) listOf(s) else stack + s }
     fun back() { if (stack.size > 1) stack = stack.dropLast(1) }
@@ -93,6 +96,12 @@ private val ROOTS = listOf(Screen.Meetings, Screen.Receive, Screen.Settings)
             Box(Modifier.padding(padding).fillMaxSize()) {
                 val current = { id: String -> sessions.firstOrNull { it.id == id } }
                 when (val s = screen) {
+                    Screen.Welcome -> WelcomeScreen(ui, pref, onGuide = { go(Screen.Page("guide")) }, onDone = { getReady ->
+                        val done = pref.copy(onboarded = true)
+                        pref = done
+                        act { app.vault.putPrivate("preferences", json.encodeToString(done)) }
+                        stack = if (getReady) listOf(Screen.Meetings, Screen.Page("prepare")) else listOf(Screen.Meetings)
+                    })
                     Screen.Meetings -> MeetingsScreen(ui, sessions, recording, processing, pref,
                         onNew = { go(Screen.Setup) }, onOpen = { go(Screen.Meeting(it)) }, onRecording = { go(Screen.Recording) },
                         onPrepare = { go(Screen.Page("prepare")) })

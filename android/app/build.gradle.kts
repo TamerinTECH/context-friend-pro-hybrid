@@ -15,8 +15,8 @@ android {
         applicationId = "com.tamerintech.contextfriendpro"
         minSdk = 31
         targetSdk = 36
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 10
+        versionName = "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         // Firebase options come from untracked local.properties, never from a committed google-services.json.
         // Without them the app builds and runs fully offline; the hybrid features show "not configured".

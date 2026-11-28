@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.StatFs
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -95,7 +96,7 @@ private fun cloudState(config: HybridConfig) = when {
                              onNearbyProfiles: () -> Unit) {
     val title = when (name) {
         "ai" -> "page_ai"; "activity" -> "page_activity"; "storage" -> "page_storage"; "cloud" -> "page_cloud"; "language" -> "language"
-        "models" -> "page_models"; "voice" -> "page_voice"; else -> "prepare_title_short"
+        "models" -> "page_models"; "voice" -> "page_voice"; "guide" -> "guide_title"; else -> "prepare_title_short"
     }
     Column(Modifier.fillMaxSize()) {
         PageTop(ui.t(title), ui, onBack)
@@ -108,6 +109,7 @@ private fun cloudState(config: HybridConfig) = when {
                 "language" -> LanguagePage(ui, pref, onPref)
                 "models" -> ModelsPage(ui)
                 "voice" -> VoicePage(ui, pref, onPref, onNearbyProfiles)
+                "guide" -> LocalAiGuidePage(ui, pref, onPage)
                 else -> PreparePage(ui, pref, onPage)
             }
         }
@@ -171,6 +173,7 @@ private fun cloudState(config: HybridConfig) = when {
             Text(t("engine_note"), style = MaterialTheme.typography.bodyMedium, color = Brand.Muted)
         }
         PrimaryButton(t("prepare_title_short"), { onPage("prepare") })
+        SecondaryButton(t("guide_title"), { onPage("guide") }, icon = Icons.Default.Info)
         SecondaryButton(t("page_models"), { onPage("models") })
     }
 }
@@ -240,12 +243,60 @@ private fun cloudState(config: HybridConfig) = when {
             }
             if (nanoCovers && nano == NanoState.DOWNLOADABLE) Note(t("prepare_nano_hint"), Icons.Default.Info)
         }
+        TextButton(onClick = { onPage("guide") }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("guide_title")) }
         TextButton(onClick = { onPage("models") }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("technical_options")) }
         Note(t("receive_no_models"), Icons.Default.Info)
     }
 }
 
 private fun mb(bytes: Long) = "%,d MB".format(bytes / 1_000_000)
+
+// ---- Local AI guide -----------------------------------------------------------------------------------------------
+
+/** Plain steps to turn on Gemini Nano, and the ContextFriend engine for phones without it. Buttons open the right places. */
+@Composable private fun LocalAiGuidePage(ui: Ui, pref: Preferences, onPage: (String) -> Unit) {
+    val t = ui.t
+    val app = ui.app
+    val nano by app.nano.collectAsState()
+    val generation by app.generation.collectAsState()
+    val context = androidx.compose.ui.platform.LocalContext.current
+    fun open(intent: Intent, fallback: Intent? = null) {
+        try { context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
+        catch (_: Exception) { fallback?.let { runCatching { context.startActivity(it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } } }
+    }
+    PageColumn {
+        Text(t("guide_intro"), style = MaterialTheme.typography.bodyLarge)
+        Panel {
+            Text(t("guide_status"), style = MaterialTheme.typography.titleSmall)
+            ReadyLine(ui, remember(generation) { speechReady(app, pref) }, t("speech_to_text") + " · " + t("speaker_separation"))
+            ReadyLine(ui, nano == NanoState.AVAILABLE, t("nano_title") + " · " + t("nano_state_${nano.name}"))
+            ReadyLine(ui, remember(generation) { app.models.installed(pref.summaryModel) }, t("gemma_title"))
+        }
+        SectionTitle(t("guide_nano_title"))
+        Panel {
+            (1..5).forEach { n ->
+                Row(Modifier.padding(vertical = 4.dp)) {
+                    Box(Modifier.size(26.dp).background(Brand.PrimaryContainer, androidx.compose.foundation.shape.CircleShape), contentAlignment = Alignment.Center) {
+                        Text("$n", style = MaterialTheme.typography.labelLarge, color = Brand.OnPrimaryContainer)
+                    }
+                    Text(t("guide_nano_$n"), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(start = 12.dp).weight(1f))
+                }
+            }
+        }
+        SecondaryButton(t("guide_open_aicore"), {
+            open(Intent(Intent.ACTION_VIEW, android.net.Uri.parse("market://details?id=com.google.android.aicore")),
+                Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://play.google.com/store/apps/details?id=com.google.android.aicore")))
+        }, icon = Glyphs.Download)
+        SecondaryButton(t("guide_open_dev"), {
+            open(Intent(android.provider.Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS), Intent(android.provider.Settings.ACTION_DEVICE_INFO_SETTINGS))
+        })
+        SecondaryButton(t("refresh"), { app.refreshHybrid() })
+        SectionTitle(t("guide_gemma_title"))
+        Panel { Text(ui.tf("guide_gemma_text", "size" to mb(app.models.entry(pref.summaryModel).bytes)), style = MaterialTheme.typography.bodyLarge) }
+        PrimaryButton(t("prepare_title_short"), { onPage("prepare") }, icon = Glyphs.Download)
+        Note(t("guide_offline"), Icons.Default.Info)
+    }
+}
 
 // ---- Privacy activity ---------------------------------------------------------------------------------------------
 

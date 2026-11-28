@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Splash icon (Android 12+ splash screen, icon without background: 288 dp, content inside the 192 dp circle).
+  The badge pops in, the three sound bars move like a level meter, the eyes blink once. 1000 ms in total.
+  Shapes from drawable/logo.xml (docs/brand/make_brand.py).
+-->
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt">
+    <aapt:attr name="android:drawable">
+        <vector android:width="288dp" android:height="288dp" android:viewportWidth="288" android:viewportHeight="288">
+            <group android:name="badge" android:translateX="71" android:translateY="71" android:scaleX="1.46" android:scaleY="1.46"
+                android:pivotX="50" android:pivotY="50">
+                <path android:fillColor="#F6C453" android:pathData="M36,9 L64,9 Q70,9 71.4,15 L74.2,28 L25.8,28 L28.6,15 Q30,9 36,9 Z" />
+                <group android:name="bar1" android:pivotX="43" android:pivotY="19">
+                    <path android:fillColor="#245FD6" android:pathData="M40.70,16.80 A2.3,2.3 0 0 1 45.30,16.80 V21.20 A2.3,2.3 0 0 1 40.70,21.20 Z" />
+                </group>
+                <group android:name="bar2" android:pivotX="50" android:pivotY="18.5">
+                    <path android:fillColor="#245FD6" android:pathData="M47.70,14.30 A2.3,2.3 0 0 1 52.30,14.30 V22.70 A2.3,2.3 0 0 1 47.70,22.70 Z" />
+                </group>
+                <group android:name="bar3" android:pivotX="57" android:pivotY="19">
+                    <path android:fillColor="#245FD6" android:pathData="M54.70,17.80 A2.3,2.3 0 0 1 59.30,17.80 V20.20 A2.3,2.3 0 0 1 54.70,20.20 Z" />
+                </group>
+                <path android:fillColor="#245FD6" android:pathData="M22,28 H78 A17,17 0 0 1 95,45 V73 A17,17 0 0 1 78,90 H22 A17,17 0 0 1 5,73 V45 A17,17 0 0 1 22,28 Z" />
+                <group android:name="eyes" android:pivotX="50" android:pivotY="51.3">
+                    <path android:strokeColor="#FFFFFF" android:strokeWidth="4.6" android:strokeLineCap="round" android:pathData="M22.52,53.70 A10.0,10.0 0 0 1 39.48,53.70" />
+                    <path android:strokeColor="#FFFFFF" android:strokeWidth="4.6" android:strokeLineCap="round" android:pathData="M60.52,53.70 A10.0,10.0 0 0 1 77.48,53.70" />
+                </group>
+            </group>
+        </vector>
+    </aapt:attr>
+
+    <!-- Pop in: 0.55 -> 1.46 (the badge's resting scale) with a small overshoot. -->
+    <target android:name="badge">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator android:propertyName="scaleX" android:valueFrom="0.8" android:valueTo="1.46" android:duration="420"
+                    android:interpolator="@android:interpolator/overshoot" />
+                <objectAnimator android:propertyName="scaleY" android:valueFrom="0.8" android:valueTo="1.46" android:duration="420"
+                    android:interpolator="@android:interpolator/overshoot" />
+            </set>
+        </aapt:attr>
+    </target>
+
+    <!-- Level meter: each bar jumps and settles, one after the other. -->
+    <target android:name="bar1">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="scaleY" android:startOffset="300" android:duration="520"
+                android:valueType="floatType" android:interpolator="@android:interpolator/fast_out_slow_in">
+                <propertyValuesHolder android:propertyName="scaleY">
+                    <keyframe android:fraction="0" android:value="1" />
+                    <keyframe android:fraction="0.3" android:value="1.7" />
+                    <keyframe android:fraction="0.6" android:value="0.6" />
+                    <keyframe android:fraction="1" android:value="1" />
+                </propertyValuesHolder>
+            </objectAnimator>
+        </aapt:attr>
+    </target>
+    <target android:name="bar2">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="scaleY" android:startOffset="380" android:duration="520"
+                android:valueType="floatType" android:interpolator="@android:interpolator/fast_out_slow_in">
+                <propertyValuesHolder android:propertyName="scaleY">
+                    <keyframe android:fraction="0" android:value="1" />
+                    <keyframe android:fraction="0.3" android:value="0.5" />
+                    <keyframe android:fraction="0.6" android:value="1.3" />
+                    <keyframe android:fraction="1" android:value="1" />
+                </propertyValuesHolder>
+            </objectAnimator>
+        </aapt:attr>
+    </target>
+    <target android:name="bar3">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="scaleY" android:startOffset="460" android:duration="520"
+                android:valueType="floatType" android:interpolator="@android:interpolator/fast_out_slow_in">
+                <propertyValuesHolder android:propertyName="scaleY">
+                    <keyframe android:fraction="0" android:value="1" />
+                    <keyframe android:fraction="0.3" android:value="2.4" />
+                    <keyframe android:fraction="0.6" android:value="0.8" />
+                    <keyframe android:fraction="1" android:value="1" />
+                </propertyValuesHolder>
+            </objectAnimator>
+        </aapt:attr>
+    </target>
+
+    <!-- One blink. -->
+    <target android:name="eyes">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="scaleY" android:startOffset="700" android:duration="240" android:valueType="floatType">
+                <propertyValuesHolder android:propertyName="scaleY">
+                    <keyframe android:fraction="0" android:value="1" />
+                    <keyframe android:fraction="0.4" android:value="0.15" />
+                    <keyframe android:fraction="1" android:value="1" />
+                </propertyValuesHolder>
+            </objectAnimator>
+        </aapt:attr>
+    </target>
+</animated-vector>
